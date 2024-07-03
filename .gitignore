@@ -1,2 +1,5 @@
-node_modules/
+dist/
+yarn*
 package-lock.json
+.env
+node_modules/
