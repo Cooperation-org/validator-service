@@ -22,7 +22,7 @@ interface EmailParams {
   body: string
 }
 
-export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<void> => {
+export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<any> => {
   const mailOptions = {
     from: process.env.SES_FROM_EMAIL,
     to,
@@ -33,6 +33,7 @@ export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<voi
   try {
     const info = await transporter.sendMail(mailOptions)
     console.log(`Email sent successfully: ${info.messageId}`)
+    return info
   } catch (error: any) {
     console.error(`Failed to send email: ${error.message}`)
     throw new Error(`Failed to send email: ${error.message}`)

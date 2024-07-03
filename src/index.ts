@@ -1,6 +1,9 @@
 import express, { Request, NextFunction, Response } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+import prisma from '../prisma/prisma-client'
+import { sendEmail } from './utilities/email'
+import { UserInfo } from '@prisma/client'
 
 const app = express()
 
@@ -8,15 +11,44 @@ app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
 
+/**
+ * Description: Create a new claim
+ */
+app.post('/', async (req, res) => {
+  const { email, firstName, lastName, profileURL }: UserInfo = req.body
+
+  // send email to user
+  const result = await sendEmail({
+    to: [email],
+    subject: 'Welcome to LinkedTrust',
+    body: 'Please click the link to claim your account'
+  })
+
+  const userInfo = await prisma.userInfo.create({
+    data: {
+      email,
+      firstName,
+      lastName,
+      profileURL
+    }
+  })
+
+  // const subject = `https://live.linkedtrust.us/org/candid/applicant/${firstName}-${lastName}-${userInfo.id}`
+
+  res.status(201).json({
+    message: 'Claim created',
+    data: {
+      userInfo,
+      emailResponse: result
+    }
+  })
+})
+
 app.post('/create-claim', async (req, res) => {
-  const { email, firstName, lastName, profileUrl } = req.body
+  const { statement } = req.body
 
-  const subject = `https://live.linkedtrust.us/org/candid/applicant/${firstName}-${lastName}`
-
-  // Check if claim already exists
-  // Create new claim if not exists
-
-  // Store user info
+  // Check if claim exists
+  // Create new claim
 
   res.status(201).json({ message: 'Claim created' })
 })
@@ -24,7 +56,7 @@ app.post('/create-claim', async (req, res) => {
 app.post('/send-validation', async (req, res) => {
   const { validators, claimId } = req.body
 
-  // Check if claim exists
+  // Check if claim exists from linkedtrust
   // create validation request for each validator
   // send email to each validator
 
