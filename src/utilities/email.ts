@@ -1,7 +1,7 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+import nodemailer from 'nodemailer'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -9,17 +9,17 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
+    pass: process.env.SMTP_PASSWORD
   },
   tls: {
-    ciphers: 'SSLv3',
-  },
-});
+    ciphers: 'SSLv3'
+  }
+})
 
 interface EmailParams {
-  to: string[];
-  subject: string;
-  body: string;
+  to: string[]
+  subject: string
+  body: string
 }
 
 export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<void> => {
@@ -27,14 +27,14 @@ export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<voi
     from: process.env.SES_FROM_EMAIL,
     to,
     subject,
-    html: body,
-  };
+    html: body
+  }
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully: ${info.messageId}`);
+    const info = await transporter.sendMail(mailOptions)
+    console.log(`Email sent successfully: ${info.messageId}`)
   } catch (error: any) {
-    console.error(`Failed to send email: ${error.message}`);
-    throw new Error(`Failed to send email: ${error.message}`);
+    console.error(`Failed to send email: ${error.message}`)
+    throw new Error(`Failed to send email: ${error.message}`)
   }
-};
+}
