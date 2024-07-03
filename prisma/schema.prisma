@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserInfo {
+  id        Int    @id @default(autoincrement())
+  claimId   Int    @unique
+  firstName String
+  lastName  String
+  email     String
+}
+
+model ValidationRequest {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+
+  validatorEmail String
+  claimId        Int
+  validationStatus ValidationStatus @default(PENDING)
+  response       Boolean? @default(false)
+  validationDate DateTime?
+  statement      String?
+}
+
+enum ValidationStatus {
+  PENDING
+  COMPLETED
+}
