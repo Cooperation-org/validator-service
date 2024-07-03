@@ -13,11 +13,15 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.16.1",
+    "@types/aws-sdk": "^2.7.0",
+    "aws-sdk": "^2.1653.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.14",
     "prisma": "^5.16.1"
+    "nodemailer": "^6.9.14"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -27,6 +31,7 @@
     "@types/uuid": "^10.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "@types/nodemailer": "^6.4.15",
   }
 }
