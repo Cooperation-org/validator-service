@@ -1,39 +1,40 @@
-import nodeMailer from "nodemailer";
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
-/**
- *
- * @param to the email address of the recipient
- * @param subject the subject of the email
- * @param html the html content of the email => it'll be rendered as the body of the email and will get it from views
- *
- * @returns void
- * @description This function sends an email to the recipient with the specified subject and html content
- */
+dotenv.config();
 
-export default function sendEmail(to: string, subject: string, html: string) {
-  try {
-    const transporter = nodeMailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-    });
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT as any, 10),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+  tls: {
+    ciphers: 'SSLv3',
+  },
+});
 
-    const mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to,
-      subject,
-      html,
-    };
-
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(info);
-    });
-  } catch (error) {
-    console.log(error);
-  }
+interface EmailParams {
+  to: string[];
+  subject: string;
+  body: string;
 }
+
+export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<void> => {
+  const mailOptions = {
+    from: process.env.SES_FROM_EMAIL,
+    to,
+    subject,
+    html: body,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Email sent successfully: ${info.messageId}`);
+  } catch (error: any) {
+    console.error(`Failed to send email: ${error.message}`);
+    throw new Error(`Failed to send email: ${error.message}`);
+  }
+};
