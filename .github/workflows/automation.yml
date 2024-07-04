@@ -1,0 +1,43 @@
+name: Build and Deploy Validator-Service
+
+on:
+  push:
+    branches:
+      - pipeline
+  pull_request:
+    branches:
+      - pipeline
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Install dependencies concurrently
+      run: npm ci
+
+    - name: Run the application
+      run: npm run build
+
+     - name: Run the application
+      run: npm start
+
+    - name: Health check
+      run: |
+        sleep 10
+        curl -f https://live.linkedtrust.us || exit 1
+
