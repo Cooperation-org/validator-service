@@ -24,8 +24,8 @@ jobs:
     - name: Install dependencies concurrently
       run: npm ci
 
-    - name: Run tests
-      run: npm test
+    # - name: Run tests || This would come in once there's testing in place
+    #   run: npm test
 
     - name: Build the application
       run: npm run build
