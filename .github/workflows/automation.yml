@@ -19,16 +19,13 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '20.x'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run tests
-      run: npm test
+        node-version: '18.x'
 
     - name: Install dependencies concurrently
       run: npm ci
+
+    - name: Run tests
+      run: npm test
 
     - name: Build the application
       run: npm run build
