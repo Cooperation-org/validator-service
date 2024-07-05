@@ -47,11 +47,6 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-     
-      - run:
-          name: Copy files to server
-          command: |
-            sshpass -p "$SSH_PASSWORD" rsync -avz --delete --exclude '.git' ./ "$SSH_USER@$SSH_HOST:/root/candid/"
       - run:
           name: Install dependencies on server
           command: |
