@@ -54,10 +54,10 @@ jobs:
       - run:
           name: Copy code to server
           command: |
-            sshpass -p $SSH_PASSWORD scp -o StrictHostKeyChecking=no -r ./* $SSH_USER@$SSH_HOST:/root/candid
+            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* "$SSH_USER@$SSH_HOST:/root/candid"
       - run:
           name: Deploy application
-          command: sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'cd /root/candid && ./deploy.sh'
+          command: sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "cd /root/candid && ./deploy.sh"
 
 workflows:
   build-and-test:
