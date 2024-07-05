@@ -13,7 +13,7 @@ jobs:
       - checkout
       - node/install-packages:
           cache-path: ~/project/node_modules
-          override-ci-command: export NODE_OPTIONS="--max_old_space_size=4096" && npm install
+          override-ci-command: npm install
       - run:
           command: npm install jest-junit
       - run:
@@ -32,7 +32,14 @@ jobs:
           override-ci-command: npm install --save
       - run:
           command: |
-           npm run build
+           sudo apt-get update
+           sudo apt-get install -y sshpass rsync
+           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
+           if [ -d /root/candid ]; then 
+            rm -rf /root/candid; 
+           fi
+           mkdir -p /root/candid"
+           npm install --save
            ls -la
 
   deploy:
@@ -40,19 +47,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - run:
-          name: Install deployment dependencies
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y sshpass rsync
-      - run:
-          name: Prepare deployment directory on server
-          command: |
-            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            if [ -d /root/candid ]; then 
-              rm -rf /root/candid; 
-            fi
-            mkdir -p /root/candid"
+     
       - run:
           name: Copy files to server
           command: |
@@ -67,12 +62,9 @@ jobs:
           command: |
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" '
             cd /root/candid
-            if ! command -v pm2 &> /dev/null; then
-              npm install -g pm2
-            fi
             pm2 delete all || true
             pm2 start dist/index.js
-            sudo systemctl restart nginx'
+            systemctl restart nginx'
 
 workflows:
   build-and-test:
