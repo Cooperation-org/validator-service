@@ -29,7 +29,7 @@ jobs:
       - checkout
       - node/install-packages:
           cache-path: ~/project/node_modules
-          override-ci-command: npm install
+          override-ci-command: npm install --save
       - run:
           command: npm run build
   
@@ -63,6 +63,7 @@ jobs:
             if ! command -v pm2 &> /dev/null; then
               npm install -g pm2
             fi
+            npm run build
             pm2 delete all || true
             pm2 start dist/index.js
             sudo systemctl restart nginx'
