@@ -42,15 +42,11 @@ jobs:
           name: Install deployment dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install -y sshpass rsync
-      - run:
-          name: Create temporary copy for archiving
-          command: |
-            rsync -a --exclude 'project.tar.gz' ./ /tmp/project-copy/
+            sudo apt-get install -y sshpass
       - run:
           name: Archive project directory
           command: |
-            tar czf /tmp/project-copy/project.tar.gz -C /tmp/project-copy .
+            tar czf project.tar.gz --exclude=project.tar.gz --warning=no-file-changed .
       - run:
           name: Prepare deployment directory on server
           command: |
@@ -62,7 +58,7 @@ jobs:
       - run:
           name: Copy archive to server
           command: |
-            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no /tmp/project-copy/project.tar.gz "$SSH_USER@$SSH_HOST:/root/candid"
+            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no project.tar.gz "$SSH_USER@$SSH_HOST:/root/candid"
       - run:
           name: Extract archive on server
           command: |
@@ -83,7 +79,6 @@ jobs:
             echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
             echo "SMTP_PORT=$SMTP_PORT" >> .env
             echo "SMTP_USER=$SMTP_USER" >> .env
-            npm run build
             pm2 delete all || true
             pm2 start dist/index.js
             sudo systemctl restart nginx'
