@@ -21,7 +21,7 @@ jobs:
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
           path: ./test-results/
-  
+
   build-node:
     # Build node project
     executor: node/default
@@ -32,7 +32,7 @@ jobs:
           override-ci-command: npm install --save
       - run:
           command: npm run build
-  
+
   deploy:
     docker:
       - image: cimg/base:stable
@@ -42,11 +42,15 @@ jobs:
           name: Install deployment dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install -y sshpass
+            sudo apt-get install -y sshpass rsync
+      - run:
+          name: Create temporary copy for archiving
+          command: |
+            rsync -a --exclude 'project.tar.gz' ./ /tmp/project-copy/
       - run:
           name: Archive project directory
           command: |
-            tar czf project.tar.gz --exclude=project.tar.gz .
+            tar czf /tmp/project-copy/project.tar.gz -C /tmp/project-copy .
       - run:
           name: Prepare deployment directory on server
           command: |
@@ -58,7 +62,7 @@ jobs:
       - run:
           name: Copy archive to server
           command: |
-            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no project.tar.gz "$SSH_USER@$SSH_HOST:/root/candid"
+            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no /tmp/project-copy/project.tar.gz "$SSH_USER@$SSH_HOST:/root/candid"
       - run:
           name: Extract archive on server
           command: |
