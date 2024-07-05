@@ -13,7 +13,7 @@ jobs:
       - checkout
       - node/install-packages:
           cache-path: ~/project/node_modules
-          override-ci-command: export NODE_OPTIONS="--max_old_space_size=4096" && npm install
+          override-ci-command: export NODE_OPTIONS="--max_old_space_size=4096"
       - run:
           command: npm install jest-junit
       - run:
@@ -73,6 +73,7 @@ jobs:
             echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
             echo "SMTP_PORT=$SMTP_PORT" >> .env
             echo "SMTP_USER=$SMTP_USER" >> .env
+            npm run build
             pm2 delete all || true
             pm2 start dist/index.js
             sudo systemctl restart nginx'
