@@ -60,7 +60,7 @@ jobs:
           command: |
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
             cd /root/candid
-            npm install"
+            export NODE_OPTIONS="--max_old_space_size=4096" && npm install"
       - run:
           name: Deploy application
           command: |
