@@ -57,7 +57,15 @@ jobs:
             sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* "$SSH_USER@$SSH_HOST:/root/candid"
       - run:
           name: Deploy application
-          command: sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "cd /root/candid && pm2 stop all && pm2 start dist/index.js && sudo systemctl restart nginx"
+          command: |
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" '
+            cd /root/candid
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+            pm2 delete all || true
+            pm2 start dist/index.js
+            sudo systemctl restart nginx'
 
 workflows:
   build-and-test:
