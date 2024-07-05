@@ -51,6 +51,10 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "dist.tar.gz"
         target: "/root"
+        rm: true
+        strip_components: 1
+        overwrite: true
+        debug: true
 
     - name: SSH into server and deploy
       uses: appleboy/ssh-action@v0.1.1
