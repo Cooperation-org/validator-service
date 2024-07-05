@@ -63,12 +63,12 @@ app.post('/create-claim', async (req, res) => {
       sourceURI: subject,
       howKnown: 'SECOND_HAND',
       claim: 'ADMIN',
-      issuerId: 'https://live.linkedtrust.us/',
-      issuerIdType: 'URL'
+      issuerId: 'https://live.linkedtrust.us/'
     }
+    console.log('🚀 ~ app.post ~ payload:', payload)
 
     // create
-    const claim = await fetch(process.env.TRUST_CLAIM_BACKEND_BASE_URL + 'api/claim', {
+    const claim = await fetch(process.env.TRUST_CLAIM_BACKEND_BASE_URL + '/api/claim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ app.post('/create-claim', async (req, res) => {
       body: JSON.stringify(payload)
     })
     if (!claim.ok) {
-      return res.status(500).json({ message: 'Error creating claim' })
+      return res.status(500).json({ message: 'Error creating claiiiiiiiiiiiiiiiim' })
     }
 
     res.status(201).json({
@@ -88,7 +88,7 @@ app.post('/create-claim', async (req, res) => {
     })
   } catch (error) {
     console.log(error)
-    res.status(500).json({ message: 'Error creating claim' })
+    res.status(500).json({ message: 'Error creating claim: ' + error })
   }
 })
 
