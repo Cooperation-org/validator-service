@@ -21,7 +21,7 @@ jobs:
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
           path: ./test-results/
-
+  
   build-node:
     # Build node project
     executor: node/default
@@ -32,7 +32,7 @@ jobs:
           override-ci-command: npm install --save
       - run:
           command: npm run build
-
+  
   deploy:
     docker:
       - image: cimg/base:stable
@@ -44,7 +44,11 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y sshpass
       - run:
-          name: Prepare deployment directory
+          name: Archive project directory
+          command: |
+            tar czf project.tar.gz --exclude=project.tar.gz .
+      - run:
+          name: Prepare deployment directory on server
           command: |
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
             if [ -d /root/candid ]; then 
@@ -52,9 +56,16 @@ jobs:
             fi
             mkdir -p /root/candid"
       - run:
-          name: Copy code to server
+          name: Copy archive to server
           command: |
-            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r . "$SSH_USER@$SSH_HOST:/root/candid"
+            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no project.tar.gz "$SSH_USER@$SSH_HOST:/root/candid"
+      - run:
+          name: Extract archive on server
+          command: |
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
+            cd /root/candid
+            tar xzf project.tar.gz
+            rm project.tar.gz"
       - run:
           name: Deploy application
           command: |
@@ -68,6 +79,7 @@ jobs:
             echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
             echo "SMTP_PORT=$SMTP_PORT" >> .env
             echo "SMTP_USER=$SMTP_USER" >> .env
+            npm run build
             pm2 delete all || true
             pm2 start dist/index.js
             sudo systemctl restart nginx'
