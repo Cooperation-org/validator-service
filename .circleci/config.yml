@@ -46,11 +46,11 @@ jobs:
       - run:
           name: Prepare deployment directory
           command: |
-            sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST '
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
             if [ -d /root/candid ]; then 
               rm -rf /root/candid; 
             fi
-            mkdir -p /root/candid
+            mkdir -p /root/candid"
       - run:
           name: Copy code to server
           command: |
