@@ -59,8 +59,7 @@ jobs:
           name: Install dependencies on server
           command: |
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            cd /root/candid
-            export NODE_OPTIONS="--max_old_space_size=4096" && npm install"
+            cd /root/candid"
       - run:
           name: Deploy application
           command: |
