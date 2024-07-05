@@ -33,8 +33,6 @@ app.post('/', async (req, res) => {
     }
   })
 
-  // const subject = `https://live.linkedtrust.us/org/candid/applicant/${firstName}-${lastName}-${userInfo.id}`
-
   res.status(201).json({
     message: 'Claim created',
     data: {
@@ -45,12 +43,53 @@ app.post('/', async (req, res) => {
 })
 
 app.post('/create-claim', async (req, res) => {
-  const { statement } = req.body
+  try {
+    const { statement, id: userInfoId } = req.body
 
-  // Check if claim exists
-  // Create new claim
+    const userInfo = await prisma.userInfo.findUnique({
+      where: {
+        id: userInfoId
+      }
+    })
+    if (!userInfo) {
+      return res.status(404).json({ message: 'User not found' })
+    }
 
-  res.status(201).json({ message: 'Claim created' })
+    const subject = `https://live.linkedtrust.us/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
+    const payload = {
+      statement,
+      object: userInfo.profileURL,
+      subject,
+      sourceURI: subject,
+      howKnown: 'SECOND_HAND',
+      claim: 'ADMIN',
+      issuerId: 'https://live.linkedtrust.us/',
+      issuerIdType: 'URL'
+    }
+
+    // create
+    const claim = await fetch(process.env.TRUST_CLAIM_BACKEND_BASE_URL + 'api/claim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    if (!claim.ok) {
+      return res.status(500).json({ message: 'Error creating claim' })
+    }
+
+    res.status(201).json({
+      message: 'Claim created',
+      data: {
+        claim: await claim.json(),
+        userInfo
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Error creating claim' })
+  }
 })
 
 app.post('/send-validation', async (req, res) => {
