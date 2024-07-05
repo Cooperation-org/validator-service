@@ -21,7 +21,7 @@ jobs:
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
           path: ./test-results/
-  
+
   build-node:
     # Build node project
     executor: node/default
@@ -32,7 +32,7 @@ jobs:
           override-ci-command: npm install --save
       - run:
           command: npm run build
-  
+
   deploy:
     docker:
       - image: cimg/base:stable
@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Copy code to server
           command: |
-            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* "$SSH_USER@$SSH_HOST:/root/candid"
+            sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r . "$SSH_USER@$SSH_HOST:/root/candid"
       - run:
           name: Deploy application
           command: |
@@ -63,7 +63,11 @@ jobs:
             if ! command -v pm2 &> /dev/null; then
               npm install -g pm2
             fi
-            npm run build
+            echo "SES_FROM_EMAIL=$SES_FROM_EMAIL" >> .env
+            echo "SMTP_HOST=$SMTP_HOST" >> .env
+            echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
+            echo "SMTP_PORT=$SMTP_PORT" >> .env
+            echo "SMTP_USER=$SMTP_USER" >> .env
             pm2 delete all || true
             pm2 start dist/index.js
             sudo systemctl restart nginx'
