@@ -38,7 +38,7 @@ jobs:
     #   run: npm test
 
     - name: Build the application
-      run: npm run dist
+      run: npm run build
 
     - name: Archive dist files
       run: tar -czf dist.tar.gz dist
