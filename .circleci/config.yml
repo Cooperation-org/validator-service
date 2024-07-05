@@ -32,16 +32,6 @@ jobs:
           override-ci-command: npm install
       - run:
           command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
   
   deploy:
     docker:
@@ -62,9 +52,9 @@ jobs:
             fi
             mkdir -p /candid'
       - run:
-          name: Copy artifacts to server
+          name: Copy code to server
           command: |
-            sshpass -p $SSH_PASSWORD scp -o StrictHostKeyChecking=no -r ~/artifacts/* $SSH_USER@$SSH_HOST:/candid
+            sshpass -p $SSH_PASSWORD scp -o StrictHostKeyChecking=no -r ./* $SSH_USER@$SSH_HOST:/candid
       - run:
           name: Deploy application
           command: sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'cd /candid && ./deploy.sh'
