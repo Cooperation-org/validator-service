@@ -3,3 +3,5 @@ yarn*
 package-lock.json
 .env
 node_modules/
+src/utilities/email-aws-ses.ts
+coverage/

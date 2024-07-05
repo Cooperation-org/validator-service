@@ -17,7 +17,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 
   // Path to a module that runs some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['./jest.setup.ts'],
+  // setupFilesAfterEnv: ['./jest.setup.ts'],
 
   // Collect coverage information
   collectCoverage: true,
