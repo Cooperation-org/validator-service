@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Copy files to server
           command: |
-            sshpass -p "$SSH_PASSWORD" rsync -avz --delete --exclude '.git' --exclude 'node_modules' ./ "$SSH_USER@$SSH_HOST:/root/candid/"
+            sshpass -p "$SSH_PASSWORD" rsync -avz ./ "$SSH_USER@$SSH_HOST:/root/candid/"
       - run:
           name: Install dependencies on server
           command: |
@@ -73,7 +73,6 @@ jobs:
             echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
             echo "SMTP_PORT=$SMTP_PORT" >> .env
             echo "SMTP_USER=$SMTP_USER" >> .env
-            npm run build
             pm2 delete all || true
             pm2 start dist/index.js
             sudo systemctl restart nginx'
