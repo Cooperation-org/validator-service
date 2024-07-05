@@ -9,7 +9,7 @@ on:
       - pipeline
 
 jobs:
-  build:
+  dist:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,6 +28,8 @@ jobs:
         echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env
         echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
         echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env
+        cat .env
+        ls
 
     - name: Install dependencies concurrently
       run: npm install
@@ -36,10 +38,10 @@ jobs:
     #   run: npm test
 
     - name: Build the application
-      run: npm run build
+      run: npm run dist
 
-    - name: Archive build files
-      run: tar -czf build.tar.gz build
+    - name: Archive dist files
+      run: tar -czf dist.tar.gz dist
 
     - name: Copy files to server
       uses: appleboy/scp-action@v0.1.1
@@ -47,8 +49,8 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "build.tar.gz"
-        target: "/"
+        source: "dist.tar.gz"
+        target: "/root"
 
     - name: SSH into server and deploy
       uses: appleboy/ssh-action@v0.1.1
@@ -57,10 +59,10 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /
-          tar -xzf build.tar.gz
+          cd /root
+          tar -xzf dist.tar.gz
           pm2 stop all
-          pm2 start build/app.js
+          pm2 start dist/index.js
           sudo systemctl restart nginx
 
     - name: Health check
