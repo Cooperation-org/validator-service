@@ -1,6 +1,7 @@
 import express, { Request, NextFunction, Response } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+const path = require('path');
 
 const app = express()
 
@@ -8,14 +9,22 @@ app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
 
-app.post('/create-claim', async (req, res) => {
-  const { email, firstName, lastName, profileUrl } = req.body
+app.use(express.static(path.join(__dirname, 'views')));
 
-  const subject = `https://live.linkedtrust.us/org/candid/applicant/${firstName}-${lastName}`
+// Route to serve the HTML form
+app.get('/', (req, res) => {
+    res.status(200).sendFile(path.join(__dirname, '../views', 'statement-form.html'));
+});
+
+app.post('/create-claim', async (req, res) => {
+  // const { email, firstName, lastName, profileUrl } = req.body
+
+  // const subject = `https://live.linkedtrust.us/org/candid/applicant/${firstName}-${lastName}`
 
   // Check if claim already exists
   // Create new claim if not exists
-
+  const statement = req.body.statement
+  console.log(statement)
   // Store user info
 
   res.status(201).json({ message: 'Claim created' })
