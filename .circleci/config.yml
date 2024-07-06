@@ -38,9 +38,11 @@ jobs:
            if [ -d /root/candid ]; then 
             rm -rf /root/candid; 
            fi
-           mkdir -p /root/candid"
-           npm install --save
+           mkdir -p /root/candid
+           ls
+           npm install 
            ls -la
+           npm run build"
 
   deploy:
     docker:
@@ -53,9 +55,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y sshpass rsync
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            cd /root/candid
-            npm install
-            npm run build"
+            cd /root/candid"
       - run:
           name: Deploy application
           command: |
