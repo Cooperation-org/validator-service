@@ -4,53 +4,89 @@ orbs:
   node: circleci/node@5
 
 jobs:
-  test-build-deploy:
+  test-node:
+    # Install node dependencies and run tests
     executor: node/default
     environment:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
-      - run:
-          name: Ensure working directory exists on server
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y sshpass rsync
-            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            mkdir -p /root/candid"
-      - run:
-          name: Clone repository on server
-          command: |
-            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            cd /root/candid
-            git clone https://github.com/Cooperation-org/validator-service.git && git checkout main. || (cd /root/candid && git pull origin main)"
       - node/install-packages:
           cache-path: ~/project/node_modules
-          override-ci-command: npm install
+          override-ci-command: export NODE_OPTIONS="--max_old_space_size=4096" && npm install
       - run:
-          name: Install additional packages
           command: npm install jest-junit
       - run:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
-          path: /test-results/
+          path: ./test-results/
+
+  build-node:
+    # Build node project
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install --save
       - run:
-          name: Install SSH dependencies
+          command: npm run build
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Install deployment dependencies
           command: |
             sudo apt-get update
             sudo apt-get install -y sshpass rsync
       - run:
-          name: Build and deploy project
+          name: Prepare deployment directory on server
           command: |
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
+            if [ -d /root/candid ]; then 
+              rm -rf /root/candid; 
+            fi
+            mkdir -p /root/candid"
+      - run:
+          name: Copy files to server
+          command: |
+            sshpass -p "$SSH_PASSWORD" rsync -avz ./ "$SSH_USER@$SSH_HOST:/root/candid/"
+      - run:
+          name: Install dependencies on server
+          command: |
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
+            cd /root/candid"
+      - run:
+          name: Deploy application
+          command: |
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" '
             cd /root/candid
+            ls
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+            echo "SES_FROM_EMAIL=$SES_FROM_EMAIL" >> .env
+            echo "SMTP_HOST=$SMTP_HOST" >> .env
+            echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
+            echo "SMTP_PORT=$SMTP_PORT" >> .env
+            echo "SMTP_USER=$SMTP_USER" >> .env
             npm install
             npm run build
             pm2 delete all || true
             pm2 start dist/index.js
-            systemctl restart nginx"
+            sudo systemctl restart nginx'
 
 workflows:
-  build-and-test-deploy:
+  build-and-test:
     jobs:
-      - test-build-deploy
+      - test-node
+      - build-node:
+          requires:
+            - test-node
+      - deploy:
+          requires:
+            - build-node
