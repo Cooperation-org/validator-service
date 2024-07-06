@@ -36,22 +36,8 @@ jobs:
   deploy:
     docker:
       - image: cimg/base:stable
-    environment:
-      SES_FROM_EMAIL: $SES_FROM_EMAIL
-      SMTP_HOST: $SMTP_HOST
-      SMTP_PASSWORD: $SMTP_PASSWORD
-      SMTP_PORT: $SMTP_PORT
-      SMTP_USER: $SMTP_USER
     steps:
       - checkout
-      - run:
-          name: Verify Environment Variables
-          command: |
-            echo "SES_FROM_EMAIL=$SES_FROM_EMAIL"
-            echo "SMTP_HOST=$SMTP_HOST"
-            echo "SMTP_PASSWORD=$SMTP_PASSWORD"
-            echo "SMTP_PORT=$SMTP_PORT"
-            echo "SMTP_USER=$SMTP_USER"
       - run:
           name: Install deployment dependencies
           command: |
