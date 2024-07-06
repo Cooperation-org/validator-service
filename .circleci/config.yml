@@ -50,8 +50,12 @@ jobs:
       - run:
           name: Install dependencies on server
           command: |
+            sudo apt-get update
+            sudo apt-get install -y sshpass rsync
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            cd /root/candid"
+            cd /root/candid
+            npm install
+            npm run build"
       - run:
           name: Deploy application
           command: |
