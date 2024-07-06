@@ -4,74 +4,51 @@ orbs:
   node: circleci/node@5
 
 jobs:
-  test-node:
-    # Install node dependencies and run tests
+  test-build-deploy:
     executor: node/default
     environment:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
+      - run:
+          name: Ensure working directory exists on server
+          command: |
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
+            mkdir -p /root/candid"
+      - run:
+          name: Clone repository on server
+          command: |
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
+            cd /root/candid
+            git clone https://github.com/Cooperation-org/validator-service.git && git checkout main. || (cd /root/candid && git pull origin main)"
       - node/install-packages:
           cache-path: ~/project/node_modules
           override-ci-command: npm install
       - run:
+          name: Install additional packages
           command: npm install jest-junit
       - run:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
           path: ./test-results/
-
-  build-node:
-    # Build node project
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          cache-path: ~/project/node_modules
-          override-ci-command: npm install --save
       - run:
-          command: |
-           sudo apt-get update
-           sudo apt-get install -y sshpass rsync
-           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-           if [ -d /root/candid ]; then 
-            rm -rf /root/candid; 
-           fi
-           mkdir -p /root/candid
-           ls
-           npm install 
-           ls -la
-           npm run build"
-
-  deploy:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies on server
+          name: Install SSH dependencies
           command: |
             sudo apt-get update
             sudo apt-get install -y sshpass rsync
-            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
-            cd /root/candid"
       - run:
-          name: Deploy application
+          name: Build and deploy project
           command: |
-            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" '
+            sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
             cd /root/candid
+            npm install
+            npm run build
             pm2 delete all || true
             pm2 start dist/index.js
-            systemctl restart nginx'
+            systemctl restart nginx"
 
 workflows:
-  build-and-test:
+  build-and-test-deploy:
     jobs:
-      - test-node
-      - build-node:
-          requires:
-            - test-node
-      - deploy:
-          requires:
-            - build-node
+      - test-build-deploy
