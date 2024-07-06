@@ -70,6 +70,7 @@ jobs:
             fi
             chmod +x secrets.sh
             npm install
+            cp /root/.env /root/candid/.env
             ./secrets.sh
             npm run build
             pm2 delete all || true
