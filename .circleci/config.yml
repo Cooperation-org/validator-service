@@ -13,6 +13,8 @@ jobs:
       - run:
           name: Ensure working directory exists on server
           command: |
+            sudo apt-get update
+            sudo apt-get install -y sshpass rsync
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "
             mkdir -p /root/candid"
       - run:
@@ -31,7 +33,7 @@ jobs:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
-          path: ./test-results/
+          path: /test-results/
       - run:
           name: Install SSH dependencies
           command: |
