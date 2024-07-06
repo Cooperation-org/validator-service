@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Check if environment variables are set
 if [ -z "$SES_FROM_EMAIL" ]; then
   echo "SES_FROM_EMAIL is not set"
 else
