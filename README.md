@@ -9,7 +9,7 @@ validator-service is a Node application for candid, the engineering steps can be
 More information on this can be found on the engineering docs, present at [Candid-Engineering-Docs](https://docs.google.com/document/d/12HLb40CLwV3LVKaKv_fFac6-IKoSEal7e1zTKrGU0yA/edit#heading=h.70aj67ugiq40) and the technologies involved includes: `Nodejs`, `npm`, `PG Database`, `Prisma CLI` and `Expressjs`
 
 ## Run the application
-
+### NB: The Application is fully running on a CI/CD Pipeline, which tests, builds and deploys the code, anything it's merge and added to the main branch
 Currently, we can run the app using Docker or through by just using common node commands, in the first step, we'd be exploring how to run the validator-service using docker, then in the second step, i'd show how to use common node commands to run the dev server
 
 ### 1. _Using Docker:_
