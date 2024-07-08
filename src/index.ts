@@ -2,6 +2,9 @@ import express, { Request, NextFunction, Response } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
 const path = require('path');
+import prisma from '../prisma/prisma-client'
+import { sendEmail } from './utilities/email'
+import { UserInfo } from '@prisma/client'
 
 const app = express()
 
@@ -16,24 +19,91 @@ app.get('/', (req, res) => {
     res.status(200).sendFile(path.join(__dirname, '../views', 'statement-form.html'));
 });
 
+/**
+ * Description: Create a new claim
+ */
+app.post('/', async (req, res) => {
+  const { email, firstName, lastName, profileURL }: UserInfo = req.body
+
+  // send email to user
+  const result = await sendEmail({
+    to: [email],
+    subject: 'Welcome to LinkedTrust',
+    body: 'Please click the link to claim your account'
+  })
+
+  const userInfo = await prisma.userInfo.create({
+    data: {
+      email,
+      firstName,
+      lastName,
+      profileURL
+    }
+  })
+
+  res.status(201).json({
+    message: 'Claim created',
+    data: {
+      userInfo,
+      emailResponse: result
+    }
+  })
+})
+
 app.post('/create-claim', async (req, res) => {
-  // const { email, firstName, lastName, profileUrl } = req.body
+  try {
+    const { statement, id: userInfoId } = req.body
 
-  // const subject = `https://live.linkedtrust.us/org/candid/applicant/${firstName}-${lastName}`
+    const userInfo = await prisma.userInfo.findUnique({
+      where: {
+        id: userInfoId
+      }
+    })
+    if (!userInfo) {
+      return res.status(404).json({ message: 'User not found' })
+    }
 
-  // Check if claim already exists
-  // Create new claim if not exists
-  const statement = req.body.statement
-  console.log(statement)
-  // Store user info
+    const subject = `https://live.linkedtrust.us/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
+    const payload = {
+      statement,
+      object: userInfo.profileURL,
+      subject,
+      sourceURI: subject,
+      howKnown: 'SECOND_HAND',
+      claim: 'ADMIN',
+      issuerId: 'https://live.linkedtrust.us/'
+    }
+    console.log('🚀 ~ app.post ~ payload:', payload)
 
-  res.status(201).json({ message: 'Claim created' })
+    // create
+    const claim = await fetch(process.env.TRUST_CLAIM_BACKEND_BASE_URL + '/api/claim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    if (!claim.ok) {
+      return res.status(500).json({ message: 'Error creating claiiiiiiiiiiiiiiiim' })
+    }
+
+    res.status(201).json({
+      message: 'Claim created',
+      data: {
+        claim: await claim.json(),
+        userInfo
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Error creating claim: ' + error })
+  }
 })
 
 app.post('/send-validation', async (req, res) => {
   const { validators, claimId } = req.body
 
-  // Check if claim exists
+  // Check if claim exists from linkedtrust
   // create validation request for each validator
   // send email to each validator
 

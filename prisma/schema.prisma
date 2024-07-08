@@ -11,23 +11,24 @@ datasource db {
 }
 
 model UserInfo {
-  id        Int    @id @default(autoincrement())
-  claimId   Int    @unique
-  firstName String
-  lastName  String
-  email     String
+  id         Int    @id @default(autoincrement())
+  claimId    Int?    @unique
+  firstName  String
+  lastName   String
+  email      String
+  profileURL String
 }
 
 model ValidationRequest {
-  id             String   @id @default(uuid())
-  createdAt      DateTime @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
 
-  validatorEmail String
-  claimId        Int
+  validatorEmail   String
+  claimId          Int
   validationStatus ValidationStatus @default(PENDING)
-  response       Boolean? @default(false)
-  validationDate DateTime?
-  statement      String?
+  response         Boolean?         @default(false)
+  validationDate   DateTime?
+  statement        String?
 }
 
 enum ValidationStatus {
