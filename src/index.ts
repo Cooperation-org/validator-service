@@ -1,6 +1,7 @@
 import express, { Request, NextFunction, Response } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+const path = require('path');
 import prisma from '../prisma/prisma-client'
 import { sendEmail } from './utilities/email'
 import { UserInfo } from '@prisma/client'
@@ -10,6 +11,13 @@ const app = express()
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
+
+app.use(express.static(path.join(__dirname, 'views')));
+
+// Route to serve the HTML form
+app.get('/', (req, res) => {
+    res.status(200).sendFile(path.join(__dirname, '../views', 'statement-form.html'));
+});
 
 /**
  * Description: Create a new claim
