@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,19 +7,102 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserInfo {
+model Claim {
+  id               Int           @id @default(autoincrement())
+  subject          String
+  claim            String
+  object           String?
+  statement        String?
+  effectiveDate    DateTime?
+  sourceURI        String?
+  howKnown         HowKnown?
+  dateObserved     DateTime?
+  digestMultibase  String?
+  author           String?
+  curator          String?
+  aspect           String?
+  score            Float?
+  stars            Int?
+  amt              Float?
+  unit             String?
+  howMeasured      String?
+  intendedAudience String?
+  respondAt        String?
+  confidence       Float?
+  issuerId         String?
+  issuerIdType     IssuerIdType?
+  claimAddress     String?
+  proof            String?
+  createdAt        DateTime      @default(now())
+  lastUpdatedAt    DateTime      @default(now())
+  Edge             Edge[]
+}
+
+model ClaimData {
+  id      Int     @id @default(autoincrement())
+  claimId Int     @unique
+  name    String
+  Image   Image[]
+}
+
+model Edge {
+  id                          Int     @id @default(autoincrement())
+  startNodeId                 Int
+  endNodeId                   Int?
+  label                       String
+  thumbnail                   String?
+  claimId                     Int
+  Claim                       Claim   @relation(fields: [claimId], references: [id])
+  Node_Edge_endNodeIdToNode   Node?   @relation("Edge_endNodeIdToNode", fields: [endNodeId], references: [id])
+  Node_Edge_startNodeIdToNode Node    @relation("Edge_startNodeIdToNode", fields: [startNodeId], references: [id])
+}
+
+model Image {
+  id              Int       @id @default(autoincrement())
+  claimId         Int
+  url             String
+  digestMultibase String?
+  metadata        Json?
+  effectiveDate   DateTime
+  createdDate     DateTime  @default(now())
+  owner           String
+  signature       String
+  ClaimData       ClaimData @relation(fields: [claimId], references: [id])
+}
+
+model Node {
+  id                          Int        @id @default(autoincrement())
+  nodeUri                     String
+  name                        String
+  entType                     EntityType
+  descrip                     String
+  image                       String?
+  thumbnail                   String?
+  Edge_Edge_endNodeIdToNode   Edge[]     @relation("Edge_endNodeIdToNode")
+  Edge_Edge_startNodeIdToNode Edge[]     @relation("Edge_startNodeIdToNode")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  email          String?  @unique
+  passwordHash   String?
+  name           String?
+  authType       AuthType @default(PASSWORD)
+  authProviderId String?
+}
+
+model CandidUserInfo {
   id         Int    @id @default(autoincrement())
-  claimId    Int?    @unique
+  claimId    Int?   @unique
   firstName  String
   lastName   String
   email      String
   profileURL String
 }
-
 model ValidationRequest {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-
+  id               String           @id
+  createdAt        DateTime         @default(now())
+  contex           String
   validatorEmail   String
   claimId          Int
   validationStatus ValidationStatus @default(PENDING)
@@ -34,4 +114,46 @@ model ValidationRequest {
 enum ValidationStatus {
   PENDING
   COMPLETED
+  REJECTED
+  ABANDONED
+}
+
+
+enum AuthType {
+  PASSWORD
+  GITHUB
+}
+
+enum EntityType {
+  PERSON
+  ORGANIZATION
+  CLAIM
+  IMPACT
+  EVENT
+  DOCUMENT
+  PRODUCT
+  PLACE
+  UNKNOWN
+  OTHER
+}
+
+enum HowKnown {
+  FIRST_HAND
+  SECOND_HAND
+  WEB_DOCUMENT
+  VERIFIED_LOGIN
+  BLOCKCHAIN
+  SIGNED_DOCUMENT
+  PHYSICAL_DOCUMENT
+  INTEGRATION
+  RESEARCH
+  OPINION
+  OTHER
+}
+
+enum IssuerIdType {
+  DID
+  ETH
+  PUBKEY
+  URL
 }

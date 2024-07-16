@@ -3,7 +3,8 @@ import morgan from 'morgan'
 import cors from 'cors'
 import prisma from '../prisma/prisma-client'
 import { sendEmail } from './utilities/email'
-import { UserInfo } from '@prisma/client'
+import { CandidUserInfo } from '@prisma/client'
+import { LINKED_TRUST_LOCAL_URL, LINKED_TRUST_SERVER_URL, PORT } from './config/settings'
 
 const app = express()
 
@@ -15,7 +16,7 @@ app.use(cors())
  * Description: Create a new claim
  */
 app.post('/', async (req, res) => {
-  const { email, firstName, lastName, profileURL }: UserInfo = req.body
+  const { email, firstName, lastName, profileURL }: CandidUserInfo = req.body
 
   // send email to user
   const result = await sendEmail({
@@ -24,7 +25,7 @@ app.post('/', async (req, res) => {
     body: 'Please click the link to claim your account'
   })
 
-  const userInfo = await prisma.userInfo.create({
+  const userInfo = await prisma.candidUserInfo.create({
     data: {
       email,
       firstName,
@@ -45,8 +46,9 @@ app.post('/', async (req, res) => {
 app.post('/create-claim', async (req, res) => {
   try {
     const { statement, id: userInfoId } = req.body
+    console.log('🚀 ~ app.post ~ userInfoId:', userInfoId)
 
-    const userInfo = await prisma.userInfo.findUnique({
+    const userInfo = await prisma.candidUserInfo.findUnique({
       where: {
         id: userInfoId
       }
@@ -55,7 +57,7 @@ app.post('/create-claim', async (req, res) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    const subject = `https://live.linkedtrust.us/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
+    const subject = `${LINKED_TRUST_SERVER_URL}/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
     const payload = {
       statement,
       object: userInfo.profileURL,
@@ -68,7 +70,7 @@ app.post('/create-claim', async (req, res) => {
     console.log('🚀 ~ app.post ~ payload:', payload)
 
     // create
-    const claim = await fetch(process.env.TRUST_CLAIM_BACKEND_BASE_URL + '/api/claim', {
+    const claim = await fetch(LINKED_TRUST_LOCAL_URL + '/api/claim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -126,6 +128,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send('Something went wrong!')
 })
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log('Server running at http://localhost:3000')
 })
