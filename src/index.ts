@@ -4,6 +4,8 @@ import morgan from 'morgan'
 import cors from 'cors'
 import userRoutes from './routes'
 import { PORT } from './config/settings'
+const path = require('path');
+import { UserInfo } from '@prisma/client'
 
 const app = express()
 
