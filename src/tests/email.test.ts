@@ -1,4 +1,4 @@
-import { sendEmail } from '../utilities/email'
+import { sendEmail } from '../utils/email'
 
 jest.mock('../utilities/email', () => ({
   sendEmail: jest.fn()
