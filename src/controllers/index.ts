@@ -18,10 +18,10 @@ export class UserController {
     }
   }
 
-  public createDetailedClaim = async (req: Request, res: Response) => {
+  public addClaimStatement = async (req: Request, res: Response) => {
     try {
       const data = req.body
-      const result = await this.userService.createDetailedClaim(data)
+      const result = await this.userService.addClaimStatement(data)
       res.status(201).json(result)
     } catch (error: any) {
       res.status(500).json({ message: 'Error creating claim: ' + error.message })

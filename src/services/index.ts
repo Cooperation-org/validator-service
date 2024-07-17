@@ -30,10 +30,10 @@ export class UserService {
     }
   }
 
-  public async createDetailedClaim(data: any) {
+  public async addClaimStatement(data: { statement: string; id: number }) {
     const { statement, id: userInfoId } = data
 
-    const userInfo = await prisma.candidUserInfo.findUnique({
+    const userInfo = await prisma.candidUserInfo.findFirst({
       where: { id: userInfoId }
     })
 

@@ -5,7 +5,7 @@ const router = Router()
 const userController = new UserController()
 
 router.post('/', userController.createClaim)
-router.post('/create-claim', userController.createDetailedClaim)
+router.post('/add-statement', userController.addClaimStatement)
 router.post('/send-validation', userController.sendValidationRequests)
 router.post('/validate/:validationId', userController.validateClaim)
 router.get('/report/:claimId', userController.generateReport)

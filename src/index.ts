@@ -4,8 +4,6 @@ import morgan from 'morgan'
 import cors from 'cors'
 import userRoutes from './routes'
 import { PORT } from './config/settings'
-const path = require('path');
-import { UserInfo } from '@prisma/client'
 
 const app = express()
 
@@ -13,7 +11,7 @@ app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
 
-app.use('/api/users', userRoutes)
+app.use('/api/v0/', userRoutes)
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err)
