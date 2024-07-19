@@ -1,0 +1,108 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  block-size: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.container {
+  background-color: white;
+  padding: 35px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-inline-size: 380px;
+  inline-size: 100%;
+  text-align: center;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  inline-size: 95%;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+p {
+  margin-block-end: 20px;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+textarea {
+  inline-size: 90%;
+  padding: 12px 20px;
+  margin-block-end: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+textarea:focus {
+  border-color: #1a64b993;
+  outline: none;
+  box-shadow: 0 0 5px #1a64b9af;
+}
+
+textarea::placeholder {
+  color: #a5a2a2d3;
+  font-size: 0.8rem;
+}
+
+button {
+  padding: 12px 20px;
+  background-color: #1a64b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1f6dad;
+}
+
+.message {
+  margin-block-start: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  display: none;
+  font-size: 16px;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+  h2 {
+    font-size: 20px;
+  }
+  textarea,
+  button {
+    font-size: 14px;
+  }
+}
