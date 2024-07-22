@@ -1,3 +1,4 @@
+import { ClaimI } from './../index.d'
 import { Request, Response } from 'express'
 import { UserService } from '../services'
 
@@ -10,7 +11,7 @@ export class UserController {
 
   public createClaim = async (req: Request, res: Response) => {
     try {
-      const data = req.body
+      const data: ClaimI = req.body
       const result = await this.userService.createClaim(data)
       res.status(201).json(result)
     } catch (error: any) {
@@ -20,8 +21,8 @@ export class UserController {
 
   public addClaimStatement = async (req: Request, res: Response) => {
     try {
-      const data = req.body
-      const result = await this.userService.addClaimStatement(data)
+      const { id, statement } = req.body
+      const result = await this.userService.addClaimStatement(id, statement)
       res.status(201).json(result)
     } catch (error: any) {
       res.status(500).json({ message: 'Error creating claim: ' + error.message })

@@ -1,9 +1,10 @@
+import { ClaimI } from './../index.d'
 import prisma from '../../prisma/prisma-client'
 import { sendEmail } from '../utils/email'
 import { LINKED_TRUST_LOCAL_URL, LINKED_TRUST_SERVER_URL } from '../config/settings'
 
 export class UserService {
-  public async createClaim(data: any) {
+  public async createClaim(data: ClaimI) {
     const { email, firstName, lastName, profileURL } = data
 
     const emailResult = await sendEmail({
@@ -30,11 +31,9 @@ export class UserService {
     }
   }
 
-  public async addClaimStatement(data: { statement: string; id: number }) {
-    const { statement, id: userInfoId } = data
-
+  public async addClaimStatement(statement: string, id: number) {
     const userInfo = await prisma.candidUserInfo.findFirst({
-      where: { id: userInfoId }
+      where: { id }
     })
 
     if (!userInfo) {
