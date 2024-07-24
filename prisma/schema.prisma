@@ -7,6 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ValidationRequest {
+  id               Int              @id @default(autoincrement())
+  createdAt        DateTime         @default(now())
+  context          String
+  validatorName    String
+  validatorEmail   String
+  claimId          Int
+  validationStatus ValidationStatus @default(PENDING)
+  response         Boolean?         @default(false)
+  validationDate   DateTime?
+  statement        String?
+}
+
+model CandidUserInfo {
+  id         Int    @id @default(autoincrement())
+  claimId    Int?   @unique
+  firstName  String
+  lastName   String
+  email      String
+  profileURL String
+}
+
 model Claim {
   id               Int           @id @default(autoincrement())
   subject          String
@@ -36,13 +58,9 @@ model Claim {
   createdAt        DateTime      @default(now())
   lastUpdatedAt    DateTime      @default(now())
   Edge             Edge[]
-}
 
-model ClaimData {
-  id      Int     @id @default(autoincrement())
-  claimId Int     @unique
-  name    String
-  Image   Image[]
+  @@index([object(ops: raw("gin_trgm_ops"))], map: "idx_object", type: Gin)
+  @@index([subject(ops: raw("gin_trgm_ops"))], map: "idx_subject", type: Gin)
 }
 
 model Edge {
@@ -55,19 +73,10 @@ model Edge {
   Claim                       Claim   @relation(fields: [claimId], references: [id])
   Node_Edge_endNodeIdToNode   Node?   @relation("Edge_endNodeIdToNode", fields: [endNodeId], references: [id])
   Node_Edge_startNodeIdToNode Node    @relation("Edge_startNodeIdToNode", fields: [startNodeId], references: [id])
-}
 
-model Image {
-  id              Int       @id @default(autoincrement())
-  claimId         Int
-  url             String
-  digestMultibase String?
-  metadata        Json?
-  effectiveDate   DateTime
-  createdDate     DateTime  @default(now())
-  owner           String
-  signature       String
-  ClaimData       ClaimData @relation(fields: [claimId], references: [id])
+  @@index([claimId], map: "idx_edge_claimid")
+  @@index([endNodeId], map: "idx_endnodeid")
+  @@index([startNodeId], map: "idx_startnodeid")
 }
 
 model Node {
@@ -91,24 +100,57 @@ model User {
   authProviderId String?
 }
 
-model CandidUserInfo {
-  id         Int    @id @default(autoincrement())
-  claimId    Int?   @unique
-  firstName  String
-  lastName   String
-  email      String
-  profileURL String
-}
-model ValidationRequest {
-  id               String           @id
-  createdAt        DateTime         @default(now())
-  contex           String
-  validatorEmail   String
-  claimId          Int
-  validationStatus ValidationStatus @default(PENDING)
-  response         Boolean?         @default(false)
-  validationDate   DateTime?
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model restore_claim {
+  id               Int?
+  subject          String?
+  claim            String?
+  object           String?
   statement        String?
+  effectiveDate    DateTime?
+  sourceURI        String?
+  howKnown         HowKnown?
+  dateObserved     DateTime?
+  digestMultibase  String?
+  author           String?
+  curator          String?
+  aspect           String?
+  score            Float?
+  stars            Int?
+  amt              Float?
+  unit             String?
+  howMeasured      String?
+  intendedAudience String?
+  respondAt        String?
+  confidence       Float?
+  issuerId         String?
+  issuerIdType     IssuerIdType?
+  claimAddress     String?
+  proof            String?
+  createdAt        DateTime?
+  lastUpdatedAt    DateTime?
+
+  @@ignore
+}
+
+model ClaimData {
+  id      Int     @id @default(autoincrement())
+  claimId Int     @unique
+  name    String
+  Image   Image[]
+}
+
+model Image {
+  id              Int       @id @default(autoincrement())
+  claimId         Int
+  url             String
+  digestMultibase String?
+  metadata        Json?
+  effectiveDate   DateTime
+  createdDate     DateTime  @default(now())
+  owner           String
+  signature       String
+  ClaimData       ClaimData @relation(fields: [claimId], references: [id])
 }
 
 enum ValidationStatus {
@@ -117,7 +159,6 @@ enum ValidationStatus {
   REJECTED
   ABANDONED
 }
-
 
 enum AuthType {
   PASSWORD
