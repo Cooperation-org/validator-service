@@ -11,7 +11,7 @@ router.post('/', userController.createClaim)
 router.post('/add-statement', userController.addClaimStatement)
 
 // following route for sending validation requests to validators
-router.post('/send-validations', userController.sendValidationRequests)
+router.post('/send-validation-requests', userController.sendValidationRequests)
 
 router.post('/validate/:validationId', userController.validateClaim)
 
