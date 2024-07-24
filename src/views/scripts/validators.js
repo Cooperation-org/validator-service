@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nameInput.placeholder = 'Name';
         nameInput.className = 'contactInput';
 
-        contactRow.appendChild(emailInput);
         contactRow.appendChild(nameInput);
+        contactRow.appendChild(emailInput);
         contactsContainer.appendChild(contactRow);
     }
 
