@@ -32,10 +32,13 @@ export class UserService {
   }
 
   public async addClaimStatement(statement: string, id: number) {
+    if (typeof id !== 'number') {
+      throw new Error('Invalid ID')
+    }
     const userInfo = await prisma.candidUserInfo.findFirst({
       where: { id }
     })
-
+    console.log('🚀 ~ UserService ~ addClaimStatement ~ userInfo:', userInfo)
     if (!userInfo) {
       throw new Error('User not found')
     }
@@ -75,7 +78,39 @@ export class UserService {
   }
 
   public async sendValidationRequests(data: any) {
-    // Logic to send validation requests
+    const { validators, claimId } = data
+    try {
+      const IsClaimExist = await prisma.claim.findUnique({
+        where: { id: +claimId }
+      })
+      if (!IsClaimExist) {
+        throw new Error('Claim not found')
+      }
+
+      const emailAddresses = validators.map(
+        (validator: { name: any; email: any }) => validator.email
+      )
+      const res = await sendEmail({
+        to: emailAddresses,
+        subject: 'New LinkedTrust claim request',
+        body: 'Please review the new claim request'
+      })
+
+      await validators.forEach(async (validator: { name: string; email: string }) => {
+        await prisma.validationRequest.create({
+          data: {
+            claimId: +claimId,
+            validatorName: validator.name,
+            validatorEmail: validator.email,
+            context: 'CANDID'
+          }
+        })
+      })
+      return res
+    } catch (err: any) {
+      console.error('Error sending validation requests:', err.message)
+      throw new Error('Error sending validation requests')
+    }
   }
 
   public async validateClaim(validationId: string, data: any) {
