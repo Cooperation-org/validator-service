@@ -8,10 +8,8 @@ datasource db {
 }
 
 model ValidationRequest {
-  id               Int              @id @default(autoincrement())
+  id               String           @id
   createdAt        DateTime         @default(now())
-  context          String
-  validatorName    String
   validatorEmail   String
   claimId          Int
   validationStatus ValidationStatus @default(PENDING)
@@ -20,7 +18,7 @@ model ValidationRequest {
   statement        String?
 }
 
-model CandidUserInfo {
+model UserInfo {
   id         Int    @id @default(autoincrement())
   claimId    Int?   @unique
   firstName  String
@@ -58,21 +56,18 @@ model Claim {
   createdAt        DateTime      @default(now())
   lastUpdatedAt    DateTime      @default(now())
   Edge             Edge[]
-
-  @@index([object(ops: raw("gin_trgm_ops"))], map: "idx_object", type: Gin)
-  @@index([subject(ops: raw("gin_trgm_ops"))], map: "idx_subject", type: Gin)
 }
 
 model Edge {
   id                          Int     @id @default(autoincrement())
-  startNodeId                 Int
+  startNodeId                 Int?
   endNodeId                   Int?
   label                       String
   thumbnail                   String?
   claimId                     Int
   Claim                       Claim   @relation(fields: [claimId], references: [id])
   Node_Edge_endNodeIdToNode   Node?   @relation("Edge_endNodeIdToNode", fields: [endNodeId], references: [id])
-  Node_Edge_startNodeIdToNode Node    @relation("Edge_startNodeIdToNode", fields: [startNodeId], references: [id])
+  Node_Edge_startNodeIdToNode Node?   @relation("Edge_startNodeIdToNode", fields: [startNodeId], references: [id], onDelete: Restrict)
 
   @@index([claimId], map: "idx_edge_claimid")
   @@index([endNodeId], map: "idx_endnodeid")
@@ -133,31 +128,9 @@ model restore_claim {
   @@ignore
 }
 
-model ClaimData {
-  id      Int     @id @default(autoincrement())
-  claimId Int     @unique
-  name    String
-  Image   Image[]
-}
-
-model Image {
-  id              Int       @id @default(autoincrement())
-  claimId         Int
-  url             String
-  digestMultibase String?
-  metadata        Json?
-  effectiveDate   DateTime
-  createdDate     DateTime  @default(now())
-  owner           String
-  signature       String
-  ClaimData       ClaimData @relation(fields: [claimId], references: [id])
-}
-
 enum ValidationStatus {
   PENDING
   COMPLETED
-  REJECTED
-  ABANDONED
 }
 
 enum AuthType {
@@ -176,6 +149,7 @@ enum EntityType {
   PLACE
   UNKNOWN
   OTHER
+  PROJECT
 }
 
 enum HowKnown {
