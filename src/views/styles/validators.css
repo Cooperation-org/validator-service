@@ -1,0 +1,179 @@
+
+
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #0A1C1D;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+
+.form-wrapper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: visible;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    min-height: 600px;
+    background: url('../../../public/validator-bg.png') no-repeat center center/cover;
+}
+
+
+.form-image {
+    background: #009688 url('../../../public/validator-float.png') no-repeat center center / cover;
+    position: absolute;
+    width: 350px;
+    height: 500px;
+    z-index: 100000000000000000000000000;
+    border-radius: 30px;
+    top: 50%;
+    left: 75%;
+    transform: translateY(-50%);
+}
+
+.form-content {
+    width: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.header  {
+    width: 65%
+}
+
+.header h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color:#fff;
+}
+
+.header p {
+    margin-bottom: 20px;
+    color: #cfcccc;
+    font-size: smaller;
+}
+
+#contactsContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    margin-bottom: 20px;
+}
+
+.contactRow {
+    display: flex;
+    flex-direction: column;
+    width: 55%;
+}
+
+.contactRow input {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: transparent;
+    border: 0px;
+    border-bottom: 1px solid #02332e;
+    color: #278077;
+}
+
+.contactRow input:hover {
+    border-bottom: 1px solid #009688;
+    outline: none;
+}
+
+.contactRow input:focus {
+    border-bottom: 1px solid #009688;
+    outline: none;
+    background: transparent;
+}
+
+.contactRow input::backdrop {
+    background-color: transparent;
+}
+
+.contactRow input::content {
+    background-color: transparent;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #009688;
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #00796b;
+}
+
+#addContactButton {
+    background: transparent;
+    padding: 0%;
+}
+
+#errorContainer {
+    color: red;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .form-wrapper {
+        flex-direction: column;
+        padding: 20px;
+        margin: 20px
+    }
+
+    .form-image {
+        display: none;
+    }
+
+    .form-content {
+        padding: 20px;
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    input {
+        width: 80%;
+    }
+
+    .contactRow {
+        width: 100%;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    .buttons button {
+        margin-bottom: 10px;
+    }
+}
