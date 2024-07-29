@@ -1,6 +1,10 @@
 import { ClaimI } from './../index.d'
 import { Request, Response } from 'express'
 import { UserService } from '../services'
+import path from 'path'
+import handlebars from 'handlebars'
+import fs from 'fs'
+import { sendEmail } from '../utils/email'
 
 export class UserController {
   private userService: UserService
@@ -9,13 +13,41 @@ export class UserController {
     this.userService = new UserService()
   }
 
-  public createClaim = async (req: Request, res: Response) => {
+  public createUserInfo = async (req: Request, res: Response) => {
     try {
       const data: ClaimI = req.body
-      const result = await this.userService.createClaim(data)
-      res.status(201).json(result)
+      const userInfo = await this.userService.createUserInfo(data)
+      // Read and compile the Handlebars template
+      const htmlContent = await fs.promises.readFile(
+        path.join(__dirname, '../', 'views', 'templates', 'welcome-email.html'),
+        'utf8'
+      )
+      const template = handlebars.compile(htmlContent)
+
+      // Generate the HTML with the template and data
+      const html = template({
+        firstName: userInfo.firstName || 'User',
+        id: userInfo.id
+      })
+      console.log('html', html)
+
+      res
+        .status(201)
+        .json({ status: 'success', message: 'Data Received', data: { id: userInfo.id } })
+
+      // Send the email
+      await sendEmail({
+        to: [userInfo.email],
+        subject: 'Welcome to LinkedTrust',
+        body: html
+      })
     } catch (error: any) {
-      res.status(500).json({ message: 'Error creating claim: ' + error.message })
+      if (error.message.includes('Validation')) {
+        return res.status(400).json({ status: 'error', message: error.message })
+      }
+      res
+        .status(500)
+        .json({ status: 'error', message: 'Error creating claim: ' + error.message })
     }
   }
 
@@ -35,9 +67,13 @@ export class UserController {
       await this.userService.sendValidationRequests(data)
       res.status(200).json({ message: 'Validation requests sent' })
     } catch (error: any) {
-      res
-        .status(500)
-        .json({ message: 'Error sending validation requests: ' + error.message })
+      if (error.message.includes('Validation')) {
+        return res.status(400).json({ status: 'error', message: error.message })
+      }
+      res.status(500).json({
+        status: 'error',
+        message: 'Error sending validation requests: ' + error.message
+      })
     }
   }
 

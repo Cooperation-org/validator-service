@@ -4,12 +4,15 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
   const statement = document.getElementById('statement').value
   console.log(statement)
 
-  fetch('/create-claim', {
+  const urlParams = new URLSearchParams(window.location.search)
+  const id = urlParams.get('id')
+  console.log(id)
+  fetch('/api/v0/add-statement', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ statement: statement })
+    body: JSON.stringify({ statement: statement, id })
   })
     .then(response => {
       console.log('===== response :', response)
@@ -28,6 +31,8 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
 
       setTimeout(() => {
         messageDiv.style.display = 'none'
+        // Redirect to the desired URL after successful submission
+        window.location.href = 'http://localhost:3000/recommend' // Replace with your desired URL
       }, 3000)
 
       document.getElementById('statementForm').reset()

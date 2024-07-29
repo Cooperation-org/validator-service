@@ -7,26 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ValidationRequest {
-  id               String           @id
-  createdAt        DateTime         @default(now())
-  validatorEmail   String
-  claimId          Int
-  validationStatus ValidationStatus @default(PENDING)
-  response         Boolean?         @default(false)
-  validationDate   DateTime?
-  statement        String?
-}
-
-model UserInfo {
-  id         Int    @id @default(autoincrement())
-  claimId    Int?   @unique
-  firstName  String
-  lastName   String
-  email      String
-  profileURL String
-}
-
 model Claim {
   id               Int           @id @default(autoincrement())
   subject          String
@@ -60,18 +40,14 @@ model Claim {
 
 model Edge {
   id                          Int     @id @default(autoincrement())
-  startNodeId                 Int?
+  startNodeId                 Int
   endNodeId                   Int?
   label                       String
   thumbnail                   String?
   claimId                     Int
   Claim                       Claim   @relation(fields: [claimId], references: [id])
   Node_Edge_endNodeIdToNode   Node?   @relation("Edge_endNodeIdToNode", fields: [endNodeId], references: [id])
-  Node_Edge_startNodeIdToNode Node?   @relation("Edge_startNodeIdToNode", fields: [startNodeId], references: [id], onDelete: Restrict)
-
-  @@index([claimId], map: "idx_edge_claimid")
-  @@index([endNodeId], map: "idx_endnodeid")
-  @@index([startNodeId], map: "idx_startnodeid")
+  Node_Edge_startNodeIdToNode Node    @relation("Edge_startNodeIdToNode", fields: [startNodeId], references: [id])
 }
 
 model Node {
@@ -95,42 +71,55 @@ model User {
   authProviderId String?
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model restore_claim {
-  id               Int?
-  subject          String?
-  claim            String?
-  object           String?
-  statement        String?
-  effectiveDate    DateTime?
-  sourceURI        String?
-  howKnown         HowKnown?
-  dateObserved     DateTime?
-  digestMultibase  String?
-  author           String?
-  curator          String?
-  aspect           String?
-  score            Float?
-  stars            Int?
-  amt              Float?
-  unit             String?
-  howMeasured      String?
-  intendedAudience String?
-  respondAt        String?
-  confidence       Float?
-  issuerId         String?
-  issuerIdType     IssuerIdType?
-  claimAddress     String?
-  proof            String?
-  createdAt        DateTime?
-  lastUpdatedAt    DateTime?
+model CandidUserInfo {
+  id               Int     @id @default(autoincrement())
+  claimId          Int?    @unique
+  firstName        String?
+  lastName         String?
+  candid_entity_id String
+  email            String
+  profileURL       String
+}
 
-  @@ignore
+model ValidationRequest {
+  id                Int              @id @default(autoincrement())
+  createdAt         DateTime         @default(now())
+  context           String
+  validatorName     String
+  validatorEmail    String
+  claimId           Int
+  validationClaimId Int?             @unique
+  validationStatus  ValidationStatus @default(PENDING)
+  response          ResponseStatus?
+  validationDate    DateTime?
+  statement         String?
+}
+
+model ClaimData {
+  id      Int     @id @default(autoincrement())
+  claimId Int     @unique
+  name    String
+  Image   Image[]
+}
+
+model Image {
+  id              Int       @id @default(autoincrement())
+  claimId         Int
+  url             String
+  digestMultibase String?
+  metadata        Json?
+  effectiveDate   DateTime
+  createdDate     DateTime  @default(now())
+  owner           String
+  signature       String
+  ClaimData       ClaimData @relation(fields: [claimId], references: [id])
 }
 
 enum ValidationStatus {
   PENDING
   COMPLETED
+  REJECTED
+  ABANDONED
 }
 
 enum AuthType {
@@ -149,7 +138,6 @@ enum EntityType {
   PLACE
   UNKNOWN
   OTHER
-  PROJECT
 }
 
 enum HowKnown {
@@ -171,4 +159,11 @@ enum IssuerIdType {
   ETH
   PUBKEY
   URL
+}
+
+enum ResponseStatus {
+  GREEN
+  YELLOW
+  GREY
+  RED
 }
