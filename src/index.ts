@@ -2,16 +2,22 @@
 import express, { Request, Response, NextFunction } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import userRoutes from './routes'
+import routes from './routes'
+import staticRoutes from './routes/static'
 import { PORT } from './config/settings'
+import path from 'path'
 
 const app = express()
+
+// Serve static files from the "views" directory
+app.use(express.static(path.join(__dirname, 'views')))
 
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
 
-app.use('/api/v0/', userRoutes)
+app.use('/', staticRoutes)
+app.use('/api/v0/', routes)
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err)

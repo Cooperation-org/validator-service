@@ -19,6 +19,7 @@ body {
   inline-size: 100%;
   text-align: center;
 }
+
 form {
   display: flex;
   flex-direction: column;
@@ -98,9 +99,11 @@ button:hover {
   .container {
     padding: 20px;
   }
+
   h2 {
     font-size: 20px;
   }
+
   textarea,
   button {
     font-size: 14px;
