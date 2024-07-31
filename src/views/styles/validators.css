@@ -134,6 +134,7 @@ button:hover {
 #addContactButton {
     background: transparent;
     padding: 0%;
+    margin-bottom: 3%;
 }
 
 #errorContainer {
