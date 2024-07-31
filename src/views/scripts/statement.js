@@ -32,7 +32,7 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
       setTimeout(() => {
         messageDiv.style.display = 'none'
         // Redirect to the desired URL after successful submission
-        window.location.href = 'http://localhost:3000/recommend' // Replace with your desired URL
+        window.location.href = 'http://localhost:3000/recommend?claimId=00'
       }, 3000)
 
       document.getElementById('statementForm').reset()

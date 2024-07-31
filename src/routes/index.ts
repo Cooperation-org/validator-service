@@ -7,7 +7,8 @@ const userController = new UserController()
 
 // following route for create cliam in DB without statment
 router.post('/', userController.createUserInfo)
-      .get('/', userController.getUserInfo)
+
+router.get('/:claimId', userController.getUserInfo)
 
 // following route for adding statement to claim
 router.post('/add-statement', userController.addClaimStatement)
