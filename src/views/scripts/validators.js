@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const submitButton = document.getElementById('submitButton')
   const errorContainer = document.getElementById('errorContainer')
 
-  const urlParams = window.location.search
-  const claimId = urlParams.slice(1)
+  const urlParams = new URLSearchParams(window.location.search)
+  const claimId = urlParams.get('claimId')
+
   console.log('claimId: ', claimId)
   let candidUserInfo
 
@@ -121,11 +122,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Response:', response2)
       } catch (error) {
         console.error('Error fetching userInfoId:', error)
-        errorContainer.textContent =
-          'Error! Please try again later.'
+        errorContainer.textContent = 'Error! Please try again later.'
       }
     }
   })
 })
-
-//  {email: 'kfattem@gmail.com'}
