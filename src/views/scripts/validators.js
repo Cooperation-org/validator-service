@@ -97,15 +97,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       errorContainer.textContent = ''
 
       try {
-        const response = await fetch(BACKEND_URL + `/claim/${claimId}`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch userInfoId')
-        }
-        const data = await response.json()
-        const userInfoId = data.id
-
         const formData = {
-          userInfoId,
+          userInfoId: candidUserInfo.id,
           contacts
         }
 
