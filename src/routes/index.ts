@@ -20,18 +20,4 @@ router.post('/validate/:validationId', userController.validateClaim)
 
 router.get('/report/:claimId', userController.generateReport)
 
-// helper route to get candidUSerInfo by claimId
-router.get('/claim/:claimId', async (req, res) => {
-  try {
-    const claimId = req.params.claimId
-    const result = await prisma.candidUserInfo.findUnique({
-      where: { claimId: +claimId }
-    })
-
-    res.status(200).json(result)
-  } catch (error: any) {
-    res.status(500).json({ message: 'Error getting claim: ' + error.message })
-  }
-})
-
 export default router
