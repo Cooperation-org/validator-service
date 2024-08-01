@@ -142,6 +142,12 @@ button:hover {
     font-size: 0.8rem;
 }
 
+.deleteButton {
+    width: 25%;
+    margin-left: auto;
+}
+
+
 @media (max-width: 768px) {
     .form-wrapper {
         flex-direction: column;

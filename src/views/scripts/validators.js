@@ -20,8 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
     emailInput.placeholder = 'Email'
     emailInput.className = 'contactInput'
 
+    const deleteButton = document.createElement('button')
+    deleteButton.type = 'button'
+    deleteButton.className = 'deleteButton'
+    deleteButton.textContent = 'Delete'
+    deleteButton.addEventListener('click', () => {
+      contactsContainer.removeChild(contactRow)
+    })
+
     contactRow.appendChild(nameInput)
     contactRow.appendChild(emailInput)
+    contactRow.appendChild(deleteButton)
     contactsContainer.appendChild(contactRow)
   }
 
