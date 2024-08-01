@@ -51,9 +51,22 @@ export class UserController {
     }
   }
 
+  public getUserInfo = async (req: Request, res: Response) => {
+    try {
+      const claimId = req.query.claimId as string
+      const result = await this.userService.getUserInfo(+claimId)
+      res.status(200).json(result)
+    } catch (error: any) {
+      res.status(500).json({ message: 'Error getting claim: ' + error.message
+      })
+    }
+  }
+
   public addClaimStatement = async (req: Request, res: Response) => {
     try {
-      const { id, statement } = req.body
+      const {id, statement } = req.body
+      console.log('id from addClaimStatement', id)
+      console.log('statement from addClaimStatement', statement)
       const result = await this.userService.addClaimStatement(statement, +id)
       res.status(201).json(result)
     } catch (error: any) {

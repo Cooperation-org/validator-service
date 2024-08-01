@@ -1,10 +1,28 @@
 const BACKEND_URL = 'http://localhost:3000/api/v0'
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const contactsContainer = document.getElementById('contactsContainer')
   const addContactButton = document.getElementById('addContactButton')
   const submitButton = document.getElementById('submitButton')
   const errorContainer = document.getElementById('errorContainer')
+
+  const urlParams = new URLSearchParams(window.location.search)
+  const claimId = urlParams.get('claimId')
+
+  console.log('claimId: ', claimId)
+  let candidUserInfo
+
+  try {
+    const response = await fetch(BACKEND_URL + `/${claimId}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch userInfoId')
+    }
+    const data = await response.json()
+    candidUserInfo = data
+  } catch (error) {
+    console.error('Error fetching userInfoId:', error)
+    errorContainer.textContent = 'Error! Please try again later.'
+  }
 
   function addContactRow() {
     const contactRow = document.createElement('div')
@@ -42,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
   submitButton.addEventListener('click', async () => {
     const contactRows = document.querySelectorAll('.contactRow')
     const contacts = []
-    let hasError = false
+    let hasError = false,
+      hasOwnEmail = false
 
     contactRows.forEach(row => {
       const emailInput = row.querySelector('input[type="email"]')
@@ -60,6 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (email && name) {
+        if (email.toLowerCase() === candidUserInfo.email.toLowerCase()) {
+          hasOwnEmail = true
+          emailInput.classList.add('error')
+        }
         contacts.push({ email, name })
       }
     })
@@ -68,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
       errorContainer.textContent =
         errorContainer.textContent ||
         'Please fill out both the name and email for all contacts.'
+    } else if (hasOwnEmail) {
+      errorContainer.textContent = 'You cannot add your own email as a contact.'
     } else {
       errorContainer.textContent = ''
-      const urlParams = new URLSearchParams(window.location.search)
-      const claimId = urlParams.get('claimId')
 
       try {
         const response = await fetch(BACKEND_URL + `/claim/${claimId}`)
@@ -99,8 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Response:', response2)
       } catch (error) {
         console.error('Error fetching userInfoId:', error)
-        errorContainer.textContent =
-          'Error fetching user information. Please try again later.'
+        errorContainer.textContent = 'Error! Please try again later.'
       }
     }
   })

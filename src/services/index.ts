@@ -46,6 +46,27 @@ export class UserService {
     return userInfo
   }
 
+  /**
+   * Get user info by claim ID
+   * @param claimId - Claim ID
+   * @returns User info
+   */
+  public async getUserInfo(claimId: number) {
+    if (typeof claimId !== 'number') {
+      throw new Error('Invalid ID')
+    }
+
+    const userInfo = await prisma.candidUserInfo.findUnique({
+      where: { id: claimId }
+    })
+
+    if (!userInfo) {
+      throw new Error('User not found')
+    }
+
+    return userInfo
+  }
+
   public async addClaimStatement(statement: string, id: number) {
     if (typeof id !== 'number') {
       throw new Error('Invalid ID')
@@ -59,6 +80,7 @@ export class UserService {
     }
 
     const subject = `${LINKED_TRUST_SERVER_URL}/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
+
     const payload = {
       statement,
       object: userInfo.profileURL,
@@ -81,6 +103,7 @@ export class UserService {
       throw new Error('Error creating claim')
     }
 
+    console.log('we have a problem here')
     const claim = await claimResponse.json()
 
     // update userInfo
@@ -90,7 +113,6 @@ export class UserService {
         claimId: claim.id
       }
     })
-
     return {
       message: 'Claim created',
       data: {
