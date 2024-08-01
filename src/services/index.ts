@@ -80,6 +80,7 @@ export class UserService {
     }
 
     const subject = `${LINKED_TRUST_SERVER_URL}/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
+
     const payload = {
       statement,
       object: userInfo.profileURL,
@@ -102,6 +103,7 @@ export class UserService {
       throw new Error('Error creating claim')
     }
 
+    console.log('we have a problem here')
     const claim = await claimResponse.json()
 
     // update userInfo
@@ -111,7 +113,6 @@ export class UserService {
         claimId: claim.id
       }
     })
-
     return {
       message: 'Claim created',
       data: {

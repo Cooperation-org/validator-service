@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const submitButton = document.getElementById('submitButton')
   const errorContainer = document.getElementById('errorContainer')
 
-  const urlParams = new URLSearchParams(window.location.search)
-  const claimId = urlParams.get('claimId')
+  const urlParams = window.location.search
+  const claimId = urlParams.slice(1)
+  console.log('claimId: ', claimId)
   let candidUserInfo
 
   try {

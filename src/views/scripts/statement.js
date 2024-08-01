@@ -4,9 +4,11 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
   const statement = document.getElementById('statement').value
   console.log(statement)
 
-  const urlParams = new URLSearchParams(window.location.search)
-  const id = urlParams.get('id')
-  console.log(id)
+  const urlParams = window.location.search
+  const id = urlParams.slice(1);
+
+  console.log('urlParams =======', urlParams)
+  console.log('id =======', id)
   fetch('/api/v0/add-statement', {
     method: 'POST',
     headers: {
