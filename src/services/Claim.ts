@@ -2,6 +2,7 @@ import prisma from '../../prisma/prisma-client'
 import { sendEmail } from '../utils/email'
 import { LINKED_TRUST_URL, LINKED_TRUST_SERVER_URL } from '../config/settings'
 import Joi from 'joi'
+import path from 'path'
 import handlebars from 'handlebars'
 import fs from 'fs'
 import { ClaimI } from '../index.d'
@@ -87,7 +88,9 @@ export class ClaimService {
       sourceURI: subject,
       howKnown: 'SECOND_HAND',
       claim: 'ADMIN',
-      issuerId: 'https://live.linkedtrust.us/'
+      issuerId: 'https://live.linkedtrust.us/',
+      name: `${userInfo.firstName} ${userInfo.lastName}`,
+      effectiveDate: new Date()
     }
 
     const claimResponse = await fetch(LINKED_TRUST_URL + '/api/claim', {
@@ -121,6 +124,106 @@ export class ClaimService {
         userInfo
       }
     }
+  }
+
+  public async sendValidationRequests(data: any) {
+    const { validators, claimId } = data
+    console.log('validators', validators)
+    console.log('claimId', claimId)
+
+    // Schema validation
+    const schema = Joi.object({
+      validators: Joi.array().items(
+        Joi.object({
+          name: Joi.string().required(),
+          email: Joi.string().email().required()
+        })
+      ),
+      claimId: Joi.required()
+    })
+
+    const { error } = schema.validate(data)
+    if (error) {
+      throw new Error('Validation error: ' + error.message)
+    }
+
+    try {
+      // Check if the claim exists
+      const isClaimExist = await prisma.claim.findUnique({
+        where: { id: +claimId }
+      })
+
+      if (!isClaimExist) {
+        throw new Error('Claim not found')
+      }
+
+      const userInfo = await prisma.candidUserInfo.findUnique({
+        where: { claimId: +claimId }
+      })
+
+      // Prepare email addresses
+      const emailAddresses = validators.map(
+        (validator: { name: any; email: any }) => validator.email
+      )
+
+      const htmlContent = await fs.promises.readFile(
+        path.join(
+          __dirname,
+          '../',
+          'views',
+          'templates',
+          'validators-request-email.html'
+        ),
+        'utf8'
+      )
+      const template = handlebars.compile(htmlContent)
+
+      // Generate the HTML with the template and data
+      let emailResponse
+
+      validators.map(async (validator: { name: any; email: any }) => {
+        const html = template({
+          userInfo,
+          name: validator.name
+        })
+        // Send email
+        emailResponse = await sendEmail({
+          to: validator.email,
+          subject: 'Validation Request - LinkedTrust',
+          body: html
+        })
+        console.log('emailResponse', emailResponse)
+      })
+
+      // Create validation requests in parallel
+      const validationRequests = validators.map(
+        async (validator: { name: string; email: string }) => {
+          try {
+            return await prisma.validationRequest.create({
+              data: {
+                claimId: +claimId,
+                validatorName: validator.name,
+                validatorEmail: validator.email,
+                context: 'CANDID'
+              }
+            })
+          } catch (error: any) {
+            console.error('Error creating validation request:', error.message)
+          }
+        }
+      )
+
+      await Promise.all(validationRequests)
+
+      return emailResponse
+    } catch (err: any) {
+      console.error('Error sending validation requests:', err.message)
+      throw new Error('Error sending validation requests')
+    }
+  }
+
+  public async validateClaim(validationId: string, data: any) {
+    // Logic to validate claim
   }
 
   public async generateReport(claimId: string) {
