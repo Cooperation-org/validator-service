@@ -56,7 +56,7 @@ export class ClaimService {
     }
 
     const userInfo = await prisma.candidUserInfo.findUnique({
-      where: { id: claimId }
+      where: { claimId: claimId }
     })
 
     if (!userInfo) {
@@ -103,13 +103,17 @@ export class ClaimService {
 
     const claim = await claimResponse.json()
 
+    console.log('claim', claim)
+
     // update userInfo
-    await prisma.candidUserInfo.update({
+    const updatedUser = await prisma.candidUserInfo.update({
       where: { id },
       data: {
-        claimId: claim.id
+        claimId: claim.claim.id
       }
     })
+
+    console.log('updatedUser', updatedUser)
     return {
       message: 'Claim created',
       data: {
