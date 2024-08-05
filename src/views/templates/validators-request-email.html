@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinkedTrust - no reply</title>
+  </head>
+  <body>
+    <div class="container">
+        <h1>Welcome to LinkedTrust!</h1>
+      <div class="content">
+        <h4>Dear {{#if name}}{{name}}{{else}}User{{/if}},</h4>
+        <p>
+          You were asked to validate the claim for the user {{userInfo.firstName}} {{userInfo.lastName}}. Please click the link below to get started:
+        </p>
+        <a href="https://live.linkedtrust.us/validate?subject=https://live.linkedtrust.us/claims/{{userInfo.claimId}}" class="button">Go to website</a>
+      </div>
+    </div>
+  </body>
+</html>

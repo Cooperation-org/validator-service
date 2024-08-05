@@ -3,7 +3,9 @@ import prisma from '../../prisma/prisma-client'
 import { sendEmail } from '../utils/email'
 import { LINKED_TRUST_URL, LINKED_TRUST_SERVER_URL } from '../config/settings'
 import Joi from 'joi'
-
+import path from 'path'
+import handlebars from 'handlebars'
+import fs from 'fs'
 
 export class UserService {
   /**
@@ -88,9 +90,8 @@ export class UserService {
       claim: 'ADMIN',
       issuerId: 'https://live.linkedtrust.us/',
       name: `${userInfo.firstName} ${userInfo.lastName}`,
-      effectiveDate: new Date(),
+      effectiveDate: new Date()
     }
-
 
     const claimResponse = await fetch(LINKED_TRUST_URL + '/api/claim', {
       method: 'POST',
@@ -156,16 +157,42 @@ export class UserService {
         throw new Error('Claim not found')
       }
 
+      const userInfo = await prisma.candidUserInfo.findUnique({
+        where: { claimId: +claimId }
+      })
+
       // Prepare email addresses
       const emailAddresses = validators.map(
         (validator: { name: any; email: any }) => validator.email
       )
 
-      // Send email
-      const emailResponse = await sendEmail({
-        to: emailAddresses,
-        subject: 'New LinkedTrust claim request',
-        body: 'Please review the new claim request'
+      const htmlContent = await fs.promises.readFile(
+        path.join(
+          __dirname,
+          '../',
+          'views',
+          'templates',
+          'validators-request-email.html'
+        ),
+        'utf8'
+      )
+      const template = handlebars.compile(htmlContent)
+
+      // Generate the HTML with the template and data
+      let emailResponse
+
+      validators.map(async (validator: { name: any; email: any }) => {
+        const html = template({
+          userInfo,
+          name: validator.name,
+        })
+        // Send email
+        emailResponse = await sendEmail({
+          to: validator.email,
+          subject: 'Validation Request - LinkedTrust',
+          body: html
+        })
+        console.log('emailResponse', emailResponse)
       })
 
       // Create validation requests in parallel
