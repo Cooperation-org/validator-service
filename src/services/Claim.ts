@@ -2,7 +2,6 @@ import prisma from '../../prisma/prisma-client'
 import { sendEmail } from '../utils/email'
 import { LINKED_TRUST_URL, LINKED_TRUST_SERVER_URL } from '../config/settings'
 import Joi from 'joi'
-import path from 'path'
 import handlebars from 'handlebars'
 import fs from 'fs'
 import { ClaimI } from '../index.d'
@@ -88,12 +87,7 @@ export class ClaimService {
       sourceURI: subject,
       howKnown: 'SECOND_HAND',
       claim: 'ADMIN',
-      issuerId: 'https://live.linkedtrust.us/',
-      name:
-        userInfo.firstName && userInfo.lastName
-          ? `${userInfo.firstName} ${userInfo.lastName}`
-          : 'Candid User',
-      effectiveDate: new Date()
+      issuerId: 'https://live.linkedtrust.us/'
     }
 
     const claimResponse = await fetch(LINKED_TRUST_URL + '/api/claim', {
@@ -128,6 +122,7 @@ export class ClaimService {
       }
     }
   }
+
   public async generateReport(claimId: string) {
     // Logic to generate report
   }
