@@ -74,6 +74,7 @@ export class ClaimService {
     const userInfo = await prisma.candidUserInfo.findFirst({
       where: { id }
     })
+
     if (!userInfo) {
       throw new Error('User not found')
     }
