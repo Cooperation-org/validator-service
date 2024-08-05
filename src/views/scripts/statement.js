@@ -4,12 +4,11 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
   const statement = document.getElementById('statement').value
   console.log(statement)
 
-  let claimId
+  let claimId;
 
   const urlParams = new URLSearchParams(window.location.search)
   const id = urlParams.get('id')
-  console.log('urlParams =======', urlParams)
-  console.log('id =======', id)
+
   fetch('/api/v0/add-statement', {
     method: 'POST',
     headers: {
@@ -26,13 +25,13 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
     })
     .then(data => {
       console.log('======== data:', data)
-      claimId = data.data.claim.id
+      claimId = data.data.claim.claim.id
+
       const messageDiv = document.getElementById('message')
       messageDiv.innerText = 'Statement submitted successfully!'
       messageDiv.classList.add('success')
       messageDiv.classList.remove('error')
       messageDiv.style.display = 'block'
-
       setTimeout(() => {
         messageDiv.style.display = 'none'
         // Redirect to the desired URL after successful submission

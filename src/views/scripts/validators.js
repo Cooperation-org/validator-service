@@ -10,19 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const claimId = urlParams.get('claimId')
 
   console.log('claimId: ', claimId)
-  let candidUserInfo
-
-  try {
-    const response = await fetch(BACKEND_URL + `/${claimId}`)
-    if (!response.ok) {
-      throw new Error('Failed to fetch userInfoId')
-    }
-    const data = await response.json()
-    candidUserInfo = data
-  } catch (error) {
-    console.error('Error fetching userInfoId:', error)
-    errorContainer.textContent = 'Error! Please try again later.'
-  }
 
   function addContactRow() {
     const contactRow = document.createElement('div')
@@ -58,10 +45,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   addContactButton.addEventListener('click', addContactRow)
 
   submitButton.addEventListener('click', async () => {
+    let candidUserInfo
+
+    try {
+      const response = await fetch(BACKEND_URL + `/user/${claimId}`)
+      const data = await response.json()
+      console.log('data:', data)
+      if (!response.ok) {
+        throw new Error('Failed to fetch userInfoId')
+      }
+      candidUserInfo = data
+    } catch (error) {
+      console.error('Error fetching userInfoId:', error)
+      errorContainer.textContent = 'Error! Please try again later.'
+    }
+    
     const contactRows = document.querySelectorAll('.contactRow')
     const contacts = []
     let hasError = false,
       hasOwnEmail = false
+
 
     contactRows.forEach(row => {
       const emailInput = row.querySelector('input[type="email"]')
