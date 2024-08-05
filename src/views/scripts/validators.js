@@ -39,6 +39,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     contactsContainer.appendChild(contactRow)
   }
 
+  function createModal(message) {
+    const modal = document.createElement('div')
+    modal.className = 'modal'
+    modal.innerHTML = `
+      <div class="modal-content">
+        <p>${message}</p>
+      </div>
+    `
+    document.body.appendChild(modal)
+    return modal
+  }
+
+  function showModal(modal) {
+    modal.style.display = 'flex'
+    setTimeout(() => {
+      modal.style.opacity = '1'
+    }, 10)
+  }
+
+  function hideModal(modal) {
+    modal.style.opacity = '0'
+    setTimeout(() => {
+      modal.style.display = 'none'
+      document.body.removeChild(modal)
+    }, 300)
+  }
+
   addContactRow()
   addContactRow()
 
@@ -59,12 +86,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error fetching userInfoId:', error)
       errorContainer.textContent = 'Error! Please try again later.'
     }
-    
+
     const contactRows = document.querySelectorAll('.contactRow')
     const contacts = []
     let hasError = false,
       hasOwnEmail = false
-
 
     contactRows.forEach(row => {
       const emailInput = row.querySelector('input[type="email"]')
@@ -116,8 +142,25 @@ document.addEventListener('DOMContentLoaded', async () => {
           })
         })
         console.log('Response:', response2)
+
+        if (response2.ok) {
+          const successModal = createModal('Contacts submitted successfully!')
+          showModal(successModal)
+
+          setTimeout(() => {
+            hideModal(successModal)
+            contactRows.forEach(row => {
+              const emailInput = row.querySelector('input[type="email"]')
+              const nameInput = row.querySelector('input[type="text"]')
+              emailInput.value = ''
+              nameInput.value = ''
+            })
+          }, 5000)
+        } else {
+          errorContainer.textContent = 'Error submitting contacts. Please try again.'
+        }
       } catch (error) {
-        console.error('Error fetching userInfoId:', error)
+        console.error('Error submitting contacts:', error)
         errorContainer.textContent = 'Error! Please try again later.'
       }
     }
