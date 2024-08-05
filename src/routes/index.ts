@@ -20,4 +20,6 @@ router.post('/validate/:validationId', userController.validateClaim)
 
 router.get('/report/:claimId', userController.generateReport)
 
+router.get('/validation/:validationId', userController.getValidationRequest)
+
 export default router

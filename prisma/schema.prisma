@@ -72,8 +72,10 @@ model User {
 }
 
 model CandidUserInfo {
-  id               Int     @id @default(autoincrement())
-  claimId          Int?    @unique
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  claimId          Int?     @unique
   firstName        String?
   lastName         String?
   candid_entity_id String
@@ -84,6 +86,7 @@ model CandidUserInfo {
 model ValidationRequest {
   id                Int              @id @default(autoincrement())
   createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
   context           String
   validatorName     String
   validatorEmail    String
@@ -91,28 +94,27 @@ model ValidationRequest {
   validationClaimId Int?             @unique
   validationStatus  ValidationStatus @default(PENDING)
   response          ResponseStatus?
+  rating            Int?
   validationDate    DateTime?
   statement         String?
 }
 
 model ClaimData {
-  id      Int     @id @default(autoincrement())
-  claimId Int     @unique
+  id      Int    @id @default(autoincrement())
+  claimId Int    @unique
   name    String
-  Image   Image[]
 }
 
 model Image {
-  id              Int       @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   claimId         Int
   url             String
   digestMultibase String?
   metadata        Json?
   effectiveDate   DateTime
-  createdDate     DateTime  @default(now())
+  createdDate     DateTime @default(now())
   owner           String
   signature       String
-  ClaimData       ClaimData @relation(fields: [claimId], references: [id])
 }
 
 enum ValidationStatus {
@@ -124,6 +126,7 @@ enum ValidationStatus {
 
 enum AuthType {
   PASSWORD
+  OAUTH
   GITHUB
 }
 
