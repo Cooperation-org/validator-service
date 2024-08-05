@@ -1,7 +1,6 @@
 import prisma from '../../prisma/prisma-client'
 import { sendEmail } from '../utils/email'
 import { LINKED_TRUST_URL, LINKED_TRUST_SERVER_URL } from '../config/settings'
-import path from 'path'
 import Joi from 'joi'
 import handlebars from 'handlebars'
 import fs from 'fs'
@@ -74,7 +73,7 @@ export class ClaimService {
     const userInfo = await prisma.candidUserInfo.findFirst({
       where: { id }
     })
-    console.log('🚀 ~ UserService ~ addClaimStatement ~ userInfo:', userInfo)
+
     if (!userInfo) {
       throw new Error('User not found')
     }
@@ -98,12 +97,10 @@ export class ClaimService {
       },
       body: JSON.stringify(payload)
     })
-
     if (!claimResponse.ok) {
       throw new Error('Error creating claim')
     }
 
-    console.log('we have a problem here')
     const claim = await claimResponse.json()
 
     // update userInfo
