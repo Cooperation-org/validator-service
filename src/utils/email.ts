@@ -33,7 +33,6 @@ export const sendEmail = async ({ to, subject, body }: EmailParams): Promise<any
   try {
     const info = await transporter.sendMail(mailOptions)
     console.log(`Email sent successfully: ${info.messageId}`)
-    
     return 'Email sent successfully'
   } catch (error: any) {
     console.error(`Failed to send email: ${error.message}`)
