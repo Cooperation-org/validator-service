@@ -51,11 +51,11 @@ h1 {
   gap: 0.4rem;
 }
 
-
 a {
   color: #80cbc4;
   text-decoration: none;
-  word-break: break-all;
+  word-break: break-word;
+  /* Ensures long text will wrap */
 }
 
 a:hover {
@@ -71,6 +71,8 @@ a:hover {
 
 .review-box p {
   margin: 5px 0;
+  word-break: break-word;
+  /* Ensures long text will wrap */
 }
 
 .date {

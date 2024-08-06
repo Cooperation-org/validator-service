@@ -4,7 +4,7 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
   const statement = document.getElementById('statement').value
   console.log(statement)
 
-  let claimId;
+  let claimId
 
   const urlParams = new URLSearchParams(window.location.search)
   const id = urlParams.get('id')

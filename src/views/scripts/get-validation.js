@@ -40,17 +40,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       const validationRequest = await validationRequestResponse.json()
 
       const candidUserResponse = await fetch(
-        `http://localhost:3000/api/v0/${validationRequest.claimId}`
+        `http://localhost:3000/api/v0/user/${validationRequest.claimId}`
       )
       if (!candidUserResponse.ok) {
         throw new Error(`HTTP error! status: ${candidUserResponse.status}`)
       }
       const candidUser = await candidUserResponse.json()
 
+      const claimResponse = await fetch(`http://localhost:9000/api/claim/2`)
+      if (!claimResponse.ok) {
+        throw new Error(`HTTP error! status: ${claimResponse.status}`)
+      }
+      const claim = await claimResponse.json()
+
       return {
         validatorName: 'Validator', // Replace with actual validator name if available
         userFirstName: candidUser.firstName,
-        userStatement: validationRequest.statement,
+        userStatement: claim.claim.statement,
         issuedDate: new Date(validationRequest.createdAt).toDateString()
       }
     } catch (error) {

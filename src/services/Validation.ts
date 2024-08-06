@@ -7,7 +7,7 @@ import fs from 'fs'
 
 export class ValidationService {
   public async getValidationRequest(validationId: string) {
-    const validationRequest = await prisma.validationRequest.findFirst({
+    const validationRequest = await prisma.validationRequest.findUnique({
       where: { id: +validationId }
     })
     if (!validationRequest) {
