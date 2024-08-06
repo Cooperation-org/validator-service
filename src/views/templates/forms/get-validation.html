@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Review Submission</title>
+    <link rel="stylesheet" href="../../styles/get-validation.css" />
+  </head>
+  <body data-validation-request-id="{{validationRequestId}}">
+    <div class="container">
+      <h1 id="welcome-message">
+        Welcome! We value your input, thank you for helping keep it real
+      </h1>
+      <div id="loading" class="loading">Loading...</div>
+      <div class="content" style="display: none">
+        <div class="claim">
+          <h2 id="user-help"></h2>
+          <p>Lorem ipsum dolor sit amet consectetur</p>
+          <div class="review-box">
+            <p id="user-statement"></p>
+            <p class="date" id="issued-date"></p>
+          </div>
+        </div>
+        <div class="response">
+          <h3>Rate</h3>
+          <div class="rating">
+            <span class="star" data-value="1">&#9733;</span>
+            <span class="star" data-value="2">&#9733;</span>
+            <span class="star" data-value="3">&#9733;</span>
+            <span class="star" data-value="4">&#9733;</span>
+            <span class="star" data-value="5">&#9733;</span>
+          </div>
+          <h3>Explain why you give him this rating?</h3>
+          <textarea required id="statement" placeholder="Explain here"></textarea>
+          <button id="submit">Submit</button>
+          <div id="error-message" class="error-message"></div>
+        </div>
+      </div>
+    </div>
+    <script src="../../scripts/get-validation.js"></script>
+  </body>
+</html>

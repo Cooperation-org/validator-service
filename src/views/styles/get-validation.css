@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #10272c;
+  color: #b2dfdb;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+
+.claim,
+.response {
+  border: 2px solid #26a69a;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+a {
+  color: #80cbc4;
+  text-decoration: none;
+  word-break: break-word;
+  /* Ensures long text will wrap */
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.review-box {
+  background-color: #004d40;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.review-box p {
+  margin: 5px 0;
+  word-break: break-word;
+  /* Ensures long text will wrap */
+}
+
+.date {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #80cbc4;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  border: 2px solid #26a69a;
+  border-radius: 5px;
+  background-color: #004d40;
+  color: #b2dfdb;
+  resize: vertical;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #26a69a;
+  border: none;
+  border-radius: 5px;
+  color: #004d40;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #004d40;
+  color: #b2dfdb;
+}
+
+.loading {
+  font-size: 1.5em;
+  color: #b2dfdb;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.rating {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.star {
+  font-size: 2em;
+  color: #b2dfdb;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star.selected {
+  color: #ffeb3b;
+}
+
+.error-message {
+  color: #ff4d4d;
+  margin-top: 10px;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.5s linear;
+}
+
+.error-message.visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.star:hover,
+.star.selected {
+  color: #fcff3b;
+}
