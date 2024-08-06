@@ -72,6 +72,7 @@ export class UserController {
       const result = await this.ClaimService.addClaimStatement(statement, +id)
       res.status(201).json(result)
     } catch (error: any) {
+      console.log('error from addClaimStatement', error)
       res.status(500).json({ message: 'Error creating claim: ' + error.message })
     }
   }

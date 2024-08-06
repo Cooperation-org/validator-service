@@ -47,7 +47,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const candidUser = await candidUserResponse.json()
 
-      const claimResponse = await fetch(`http://localhost:9000/api/claim/2`)
+      const claimResponse = await fetch(
+        `http://localhost:9000/api/claim/${validationRequest.claimId}`
+      )
       if (!claimResponse.ok) {
         throw new Error(`HTTP error! status: ${claimResponse.status}`)
       }

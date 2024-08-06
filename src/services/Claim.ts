@@ -87,7 +87,12 @@ export class ClaimService {
       sourceURI: subject,
       howKnown: 'SECOND_HAND',
       claim: 'ADMIN',
-      issuerId: 'https://live.linkedtrust.us/'
+      issuerId: 'https://live.linkedtrust.us/',
+      name:
+        userInfo.firstName && userInfo.lastName
+          ? `${userInfo.firstName} ${userInfo.lastName}`
+          : 'Candid User',
+      effectiveDate: new Date()
     }
 
     const claimResponse = await fetch(LINKED_TRUST_URL + '/api/claim', {
@@ -103,17 +108,14 @@ export class ClaimService {
 
     const claim = await claimResponse.json()
 
-    console.log('claim', claim)
-
     // update userInfo
-    const updatedUser = await prisma.candidUserInfo.update({
+    await prisma.candidUserInfo.update({
       where: { id },
       data: {
         claimId: claim.claim.id
       }
     })
 
-    console.log('updatedUser', updatedUser)
     return {
       message: 'Claim created',
       data: {
