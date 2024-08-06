@@ -1,3 +1,5 @@
+const SERVER_URL = 'http://localhost:3000'
+
 document.addEventListener('DOMContentLoaded', async () => {
   let selectedRating = 0
 
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const validationRequestId = document.body.getAttribute('data-validation-request-id')
       const validationRequestResponse = await fetch(
-        `http://localhost:3000/api/v0/validation/${validationRequestId}`
+        `${SERVER_URL}/api/v0/validation/${validationRequestId}`
       )
       if (!validationRequestResponse.ok) {
         throw new Error(`HTTP error! status: ${validationRequestResponse.status}`)
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const validationRequest = await validationRequestResponse.json()
 
       const candidUserResponse = await fetch(
-        `http://localhost:3000/api/v0/user/${validationRequest.claimId}`
+        `${SERVER_URL}/api/v0/user/${validationRequest.claimId}`
       )
       if (!candidUserResponse.ok) {
         throw new Error(`HTTP error! status: ${candidUserResponse.status}`)
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const candidUser = await candidUserResponse.json()
 
       const claimResponse = await fetch(
-        `http://localhost:9000/api/claim/${validationRequest.claimId}`
+        `${SERVER_URL}/api/claim/${validationRequest.claimId}`
       )
       if (!claimResponse.ok) {
         throw new Error(`HTTP error! status: ${claimResponse.status}`)
@@ -111,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const handleSubmit = async data => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v0/add-validation/${data.validationRequestId}`,
+        `${SERVER_URL}/api/v0/add-validation/${data.validationRequestId}`,
         {
           method: 'POST',
           headers: {

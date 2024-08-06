@@ -40,24 +40,18 @@ export const generateRequestResponseColor = (rating: number) => {
 }
 
 export const generateReportResponseColor = (responses: string[]) => {
-  let numberOfGreen = 0
-  let numberOfYellow = 0
-  let numberOfRed = 0
   let totalScore = 0
 
   responses.forEach(response => {
     switch (response) {
       case ResponseStatus.GREEN:
-        numberOfGreen++
         totalScore += 3
         break
       case ResponseStatus.YELLOW:
-        numberOfYellow++
         totalScore += 2
         break
       case ResponseStatus.RED:
-        numberOfRed++
-        totalScore += 1
+        totalScore += 0
         break
       default:
         throw new Error('Invalid response status')

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://localhost:3000/api/v0'
+const SERVER_URL = 'http://localhost:3000'
 
 document.addEventListener('DOMContentLoaded', async () => {
   const contactsContainer = document.getElementById('contactsContainer')
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let candidUserInfo
 
     try {
-      const response = await fetch(BACKEND_URL + `/user/${claimId}`)
+      const response = await fetch(`${SERVER_URL}/user/${claimId}`)
       const data = await response.json()
       console.log('data:', data)
       if (!response.ok) {
@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
       console.error('Error fetching userInfoId:', error)
       errorContainer.textContent = 'Error! Please try again later.'
+      return
     }
 
     const contactRows = document.querySelectorAll('.contactRow')
@@ -131,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           contacts
         }
 
-        const response2 = await fetch(BACKEND_URL + '/send-validation-requests', {
+        const response2 = await fetch(`${SERVER_URL}/send-validation-requests`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

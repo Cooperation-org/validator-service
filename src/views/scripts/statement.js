@@ -1,3 +1,5 @@
+const SERVER_URL = 'http://localhost:3000'
+
 document.getElementById('statementForm').addEventListener('submit', function (event) {
   event.preventDefault()
 
@@ -34,7 +36,7 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
       setTimeout(() => {
         messageDiv.style.display = 'none'
         // Redirect to the desired URL after successful submission
-        window.location.href = `http://localhost:3000/recommend?claimId=${claimId}`
+        window.location.href = `${SERVER_URL}/recommend?claimId=${claimId}`
       }, 1000)
 
       document.getElementById('statementForm').reset()
