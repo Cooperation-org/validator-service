@@ -106,7 +106,6 @@ export class ClaimService {
 
     const claim = await claimResponse.json()
 
-    // console.log('claim', claim)
 
     // update userInfo
     const updatedUser = await prisma.candidUserInfo.update({
@@ -116,7 +115,6 @@ export class ClaimService {
       }
     })
 
-    // console.log('updatedUser', updatedUser)
     return {
       message: 'Claim created',
       data: {
@@ -128,8 +126,6 @@ export class ClaimService {
 
   public async sendValidationRequests(data: any) {
     const { validators, claimId } = data
-    console.log('validators', validators)
-    console.log('claimId', claimId)
 
     // Schema validation
     const schema = Joi.object({
@@ -160,8 +156,6 @@ export class ClaimService {
       const userInfo = await prisma.candidUserInfo.findUnique({
         where: { claimId: +claimId }
       })
-
-      console.log('userInfo === ', userInfo)
 
       // Prepare email addresses
       const emailAddresses = validators.map(
@@ -194,7 +188,6 @@ export class ClaimService {
           subject: 'Validation Request - LinkedTrust',
           body: html
         })
-        console.log('emailResponse', emailResponse)
       })
 
       // Create validation requests in parallel
