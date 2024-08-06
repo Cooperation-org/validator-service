@@ -1,10 +1,12 @@
+const SERVER_URL = 'http://localhost:3000'
+
 document.getElementById('statementForm').addEventListener('submit', function (event) {
   event.preventDefault()
 
   const statement = document.getElementById('statement').value
   console.log(statement)
 
-  let claimId;
+  let claimId
 
   const urlParams = new URLSearchParams(window.location.search)
   const id = urlParams.get('id')
@@ -23,9 +25,8 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
       }
       return response.json()
     })
-    .then(data => {
-      console.log('======== data:', data)
-      claimId = data.data.claim.claim.id
+    .then(result => {
+      claimId = result.data.claim.id
 
       const messageDiv = document.getElementById('message')
       messageDiv.innerText = 'Statement submitted successfully!'
@@ -35,8 +36,8 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
       setTimeout(() => {
         messageDiv.style.display = 'none'
         // Redirect to the desired URL after successful submission
-        window.location.href = `http://localhost:3000/recommend?claimId=${claimId}`
-      }, 3000)
+        window.location.href = `${SERVER_URL}/recommend?claimId=${claimId}`
+      }, 1000)
 
       document.getElementById('statementForm').reset()
     })

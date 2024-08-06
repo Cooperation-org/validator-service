@@ -6,6 +6,7 @@ import path from 'path'
 import handlebars from 'handlebars'
 import fs from 'fs'
 import { sendEmail } from '../utils/email'
+import { SERVER_URL } from '..//config/settings'
 
 export class UserController {
   private ClaimService: ClaimService
@@ -30,7 +31,7 @@ export class UserController {
       // Generate the HTML with the template and data
       const html = template({
         firstName: userInfo.firstName || 'User',
-        id: userInfo.id
+        link: `${SERVER_URL}?id=${userInfo.id}`
       })
       console.log('html', html)
 
