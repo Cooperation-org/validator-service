@@ -89,7 +89,7 @@ export class UserService {
       howKnown: 'SECOND_HAND',
       claim: 'ADMIN',
       issuerId: 'https://live.linkedtrust.us/',
-      name: `${userInfo.firstName} ${userInfo.lastName}`,
+      name: userInfo.firstName && userInfo.lastName? `${userInfo.firstName} ${userInfo.lastName}` : 'Candid User',
       effectiveDate: new Date()
     }
 
@@ -106,7 +106,7 @@ export class UserService {
 
     const claim = await claimResponse.json()
 
-    console.log('claim', claim)
+    // console.log('claim', claim)
 
     // update userInfo
     const updatedUser = await prisma.candidUserInfo.update({
@@ -116,7 +116,7 @@ export class UserService {
       }
     })
 
-    console.log('updatedUser', updatedUser)
+    // console.log('updatedUser', updatedUser)
     return {
       message: 'Claim created',
       data: {
@@ -160,6 +160,8 @@ export class UserService {
       const userInfo = await prisma.candidUserInfo.findUnique({
         where: { claimId: +claimId }
       })
+
+      console.log('userInfo === ', userInfo)
 
       // Prepare email addresses
       const emailAddresses = validators.map(
