@@ -19,7 +19,7 @@ body {
 }
 
 .form-wrapper {
-  background: url('../../../public/validator-bg.png') no-repeat center center/cover;
+  background: url('../public/validator-bg.png') no-repeat center center/cover;
   display: flex;
   justify-content: space-between;
   position: relative;
@@ -33,11 +33,8 @@ body {
 }
 
 .form-image {
-  background: #009688 url('../../../public/validator-float.png') no-repeat center
-    center/cover;
   position: absolute;
   width: 350px;
-  height: 500px;
   z-index: 100000000000000000000000000;
   border-radius: 30px;
   top: 50%;
@@ -79,6 +76,8 @@ body {
   display: flex;
   flex-direction: column;
   width: 55%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px 5px;
 }
 
 .contactRow input {
@@ -174,7 +173,7 @@ button:hover {
   margin-left: auto;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 920px) {
   .form-wrapper {
     flex-direction: column;
     padding: 20px;
