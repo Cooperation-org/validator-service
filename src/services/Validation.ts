@@ -1,6 +1,9 @@
 import { sendEmail } from '..//utils/email'
 import prisma from '../../prisma/prisma-client'
 import Joi from 'joi'
+import path from 'path'
+import handlebars from 'handlebars'
+import fs from 'fs'
 
 export class ValidationService {
   public async getValidationRequest(validationId: string) {
@@ -16,8 +19,6 @@ export class ValidationService {
 
   public async sendValidationRequests(data: any) {
     const { validators, claimId } = data
-    console.log('validators', validators)
-    console.log('claimId', claimId)
 
     // Schema validation
     const schema = Joi.object({
@@ -45,16 +46,40 @@ export class ValidationService {
         throw new Error('Claim not found')
       }
 
+      const userInfo = await prisma.candidUserInfo.findUnique({
+        where: { claimId: +claimId }
+      })
+
       // Prepare email addresses
       const emailAddresses = validators.map(
         (validator: { name: any; email: any }) => validator.email
       )
 
-      // Send email
-      const emailResponse = await sendEmail({
-        to: emailAddresses,
-        subject: 'New LinkedTrust claim request',
-        body: 'Please review the new claim request'
+      const htmlContent = await fs.promises.readFile(
+        path.join(
+          __dirname,
+          '../',
+          'views',
+          'templates',
+          'validators-request-email.html'
+        ),
+        'utf8'
+      )
+      const template = handlebars.compile(htmlContent)
+
+      // Generate the HTML with the template and data
+      let emailResponse
+      validators.map(async (validator: { name: any; email: any }) => {
+        const html = template({
+          userInfo,
+          name: validator.name
+        })
+        // Send email
+        emailResponse = await sendEmail({
+          to: validator.email,
+          subject: 'Validation Request - LinkedTrust',
+          body: html
+        })
       })
 
       // Create validation requests in parallel
@@ -76,7 +101,6 @@ export class ValidationService {
       )
 
       await Promise.all(validationRequests)
-
       return emailResponse
     } catch (err: any) {
       console.error('Error sending validation requests:', err.message)
