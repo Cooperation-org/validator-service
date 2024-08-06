@@ -87,6 +87,7 @@ body {
   border: 0px;
   border-bottom: 1px solid #02332e;
   color: #278077;
+  border-bottom: #0b4942 1px solid;
 }
 
 .contactRow input:hover {
