@@ -109,7 +109,7 @@ export class ClaimService {
 
     const claim = await claimResponse.json()
 
-    console.log('claim', claim)
+    // console.log('claim', claim)
 
     // update userInfo
     const updatedUser = await prisma.candidUserInfo.update({
