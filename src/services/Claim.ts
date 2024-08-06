@@ -5,6 +5,8 @@ import Joi from 'joi'
 import handlebars from 'handlebars'
 import fs from 'fs'
 import { ClaimI } from '../index.d'
+import { generateReportData } from '../utils/generateResponse'
+import { HowKnown } from '@prisma/client'
 
 export class ClaimService {
   /**
@@ -66,53 +68,45 @@ export class ClaimService {
     return userInfo
   }
 
-  public async addClaimStatement(statement: string, id: number) {
-    if (typeof id !== 'number') {
-      throw new Error('Invalid ID')
-    }
-    const userInfo = await prisma.candidUserInfo.findFirst({
-      where: { id }
-    })
+  public async addClaimStatement(statement: string, id: number | string) {
+    const userId = Number(id)
+    if (isNaN(userId)) throw new Error('Invalid user ID')
 
-    if (!userInfo) {
-      throw new Error('User not found')
+    const userInfo = await prisma.candidUserInfo.findUnique({
+      where: { id: userId }
+    })
+    if (!userInfo) throw new Error('User not found')
+    if (userInfo.claimId) {
+      throw new Error('Claim already exists')
     }
 
     const subject = `${LINKED_TRUST_SERVER_URL}/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
-
     const payload = {
       statement,
       object: userInfo.profileURL,
       subject,
       sourceURI: subject,
-      howKnown: 'SECOND_HAND',
+      howKnown: HowKnown.SECOND_HAND,
       claim: 'ADMIN',
       issuerId: 'https://live.linkedtrust.us/',
-      name:
-        userInfo.firstName && userInfo.lastName
-          ? `${userInfo.firstName} ${userInfo.lastName}`
-          : 'Candid User',
+      // name:
+      //   userInfo.firstName && userInfo.lastName
+      //     ? `${userInfo.firstName} ${userInfo.lastName}`
+      //     : 'Candid User',
       effectiveDate: new Date()
     }
 
-    const claimResponse = await fetch(LINKED_TRUST_URL + '/api/claim', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
+    const claim = await prisma.claim.create({
+      data: payload
     })
-    if (!claimResponse.ok) {
+    if (!claim) {
       throw new Error('Error creating claim')
     }
 
-    const claim = await claimResponse.json()
-
-    // update userInfo
     await prisma.candidUserInfo.update({
-      where: { id },
+      where: { id: +id },
       data: {
-        claimId: claim.claim.id
+        claimId: claim.id
       }
     })
 
@@ -125,7 +119,25 @@ export class ClaimService {
     }
   }
 
-  public async generateReport(claimId: string) {
-    // Logic to generate report
+  public async generateReport(claimId: string | number) {
+    const claimIdNum = Number(claimId)
+    if (isNaN(claimIdNum)) throw new Error('Invalid claim ID')
+
+    const userInfo = await this.getUserInfo(+claimId)
+    if (!userInfo) throw new Error('User not found')
+
+    const claimData = await prisma.claim.findFirst({
+      where: { id: Number(userInfo.claimId) }
+    })
+    if (!claimData) throw new Error('Claim not found')
+
+    const validationDetails = await prisma.validationRequest.findMany({
+      where: { claimId: Number(userInfo.claimId) }
+    })
+    if (!validationDetails) throw new Error('Validation details not found')
+
+    const data = Object.assign({ userInfo }, claimData, { validationDetails })
+    const report = generateReportData(data)
+    return report
   }
 }
