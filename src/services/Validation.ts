@@ -169,7 +169,7 @@ export class ValidationService {
     })) as any
 
     const subject = `{${LINKED_TRUST_SERVER_URL}/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
-    const sourceURI = `${LINKED_TRUST_SERVER_URL}/org/candid/validator/${validationRequest.validatorName}-${validationRequest.validatorEmail}-${validationRequest.id}`
+    const sourceURI = `${LINKED_TRUST_SERVER_URL}/org/candid/validator/${validationRequest.validatorName.trim().replace(" ", "-")}-${validationRequest.validatorEmail}-${validationRequest.id}`
     const reqData = {
       statement,
       stars: rating,
