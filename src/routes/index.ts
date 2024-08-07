@@ -22,6 +22,6 @@ router.get('/report/:claimId', userController.generateReport)
 
 router.get('/validation/:validationId', userController.getValidationRequest)
 
-router.get('/claim/:claimID', userController.getClaim)
+router.get('/claim/:claimId', userController.getClaim)
 
 export default router

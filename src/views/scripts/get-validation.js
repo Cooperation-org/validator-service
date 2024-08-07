@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       )
 
       if (!response.ok) {
+        showMessage('Error submitting validation, please try again later', true)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const result = await response.json()

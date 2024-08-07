@@ -4,8 +4,9 @@ import Joi, { link } from 'joi'
 import path from 'path'
 import handlebars from 'handlebars'
 import fs from 'fs'
-import { SERVER_URL } from '..//config/settings'
+import { LINKED_TRUST_SERVER_URL, SERVER_URL } from '..//config/settings'
 import { generateRequestResponseColor } from '../utils/generateResponse'
+import { HowKnown } from '@prisma/client'
 
 export class ValidationService {
   public async getValidationRequest(validationId: string) {
@@ -125,8 +126,6 @@ export class ValidationService {
   public async validateClaim(validationId: string, data: any) {
     const { statement, rating } = data
 
-    console.log('statement', statement)
-    console.log('rating', rating)
     // Schema validation
     const schema = Joi.object({
       statement: Joi.string().required(),
@@ -160,9 +159,36 @@ export class ValidationService {
         statement,
         rating,
         validationStatus: 'COMPLETED',
-        response: generateRequestResponseColor(rating)
+        response: generateRequestResponseColor(rating),
+        validationDate: new Date()
       }
     })
+
+    const userInfo = (await prisma.candidUserInfo.findUnique({
+      where: { claimId: claim.id }
+    })) as any
+
+    const subject = `{${LINKED_TRUST_SERVER_URL}/org/candid/applicant/${userInfo.firstName}-${userInfo.lastName}-${userInfo.id}`
+    const sourceURI = `${LINKED_TRUST_SERVER_URL}/org/candid/validator/${validationRequest.validatorName}-${validationRequest.validatorEmail}-${validationRequest.id}`
+    const reqData = {
+      statement,
+      stars: rating,
+      object: userInfo.profileURL,
+      subject,
+      howKnown: HowKnown.FIRST_HAND,
+      sourceURI,
+      issuerId: 'https://live.linkedtrust.us/',
+      claim: 'VALIDATOR',
+      effectiveDate: new Date()
+    }
+
+    const validatorClaim = await prisma.claim.create({
+      data: reqData
+    })
+
+    if (!validatorClaim) {
+      throw new Error('Error creating claim')
+    }
 
     return updatedValidatioReq
   }

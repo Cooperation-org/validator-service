@@ -67,8 +67,8 @@ export class UserController {
 
   public getClaim = async (req: Request, res: Response) => {
     try {
-      const { claimID } = req.params
-      const result = await this.ClaimService.getClaim(+claimID)
+      const { claimId } = req.params
+      const result = await this.ClaimService.getClaim(+claimId)
       res.status(200).json(result)
     } catch (error: any) {
       res.status(500).json({ message: 'Error getting claim: ' + error.message })
@@ -110,9 +110,9 @@ export class UserController {
       const data = req.body
       const validatedCaim = await this.validationService.validateClaim(validationId, data)
 
-      console.log(validatedCaim)
       res.status(200).json({ message: 'Claim validated', data: validatedCaim })
     } catch (error: any) {
+      console.log('error from validateClaim', error)
       res.status(500).json({ message: 'Error validating claim: ' + error.message })
     }
   }
