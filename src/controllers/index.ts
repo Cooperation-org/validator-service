@@ -65,6 +65,16 @@ export class UserController {
     }
   }
 
+  public getClaim = async (req: Request, res: Response) => {
+    try {
+      const { claimID } = req.params
+      const result = await this.ClaimService.getClaim(+claimID)
+      res.status(200).json(result)
+    } catch (error: any) {
+      res.status(500).json({ message: 'Error getting claim: ' + error.message })
+    }
+  }
+
   public addClaimStatement = async (req: Request, res: Response) => {
     try {
       const { id, statement } = req.body
@@ -98,8 +108,10 @@ export class UserController {
     try {
       const validationId = req.params.validationId
       const data = req.body
-      await this.validationService.validateClaim(validationId, data)
-      res.status(200).json({ message: 'Validation recorded' })
+      const validatedCaim = await this.validationService.validateClaim(validationId, data)
+
+      console.log(validatedCaim)
+      res.status(200).json({ message: 'Claim validated', data: validatedCaim })
     } catch (error: any) {
       res.status(500).json({ message: 'Error validating claim: ' + error.message })
     }
@@ -118,9 +130,12 @@ export class UserController {
   public getValidationRequest = async (req: Request, res: Response) => {
     try {
       const validationId = req.params.validationId
+      console.log('validationId', validationId)
       const validationRequest = await this.validationService.getValidationRequest(
         validationId
       )
+
+      console.log('validationRequest', validationRequest)
       res.status(200).json(validationRequest)
     } catch (error: any) {
       res
