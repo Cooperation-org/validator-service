@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.content').style.display = 'flex'
     document.getElementById('loading').style.display = 'none'
   }
-
   const getReqData = async () => {
     try {
       const validationRequestId = document.body.getAttribute('data-validation-request-id')
+
       const validationRequestResponse = await fetch(
         `${SERVER_URL}/api/v0/validation/${validationRequestId}`
       )
@@ -50,17 +50,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       const candidUser = await candidUserResponse.json()
 
       const claimResponse = await fetch(
-        `${SERVER_URL}/api/claim/${validationRequest.claimId}`
+        `${SERVER_URL}/api/v0/claim/${validationRequest.claimId}`
       )
       if (!claimResponse.ok) {
         throw new Error(`HTTP error! status: ${claimResponse.status}`)
       }
       const claim = await claimResponse.json()
-
       return {
-        validatorName: 'Validator', // Replace with actual validator name if available
+        validatorName: validationRequest.validatorName,
         userFirstName: candidUser.firstName,
-        userStatement: claim.claim.statement,
+        userStatement: claim.statement,
         issuedDate: new Date(validationRequest.createdAt).toDateString()
       }
     } catch (error) {
@@ -70,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const data = await getReqData()
+
   if (data) {
     showContent(data)
   } else {
@@ -113,18 +113,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const handleSubmit = async data => {
     try {
       const response = await fetch(
-        `${SERVER_URL}/api/v0/add-validation/${data.validationRequestId}`,
+        `${SERVER_URL}/api/v0/validate/${data.validationRequestId}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            rating: data.rating,
+            rating: +data.rating,
             statement: data.statement
           })
         }
       )
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }

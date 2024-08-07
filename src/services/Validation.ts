@@ -1,9 +1,11 @@
 import { sendEmail } from '..//utils/email'
 import prisma from '../../prisma/prisma-client'
-import Joi from 'joi'
+import Joi, { link } from 'joi'
 import path from 'path'
 import handlebars from 'handlebars'
 import fs from 'fs'
+import { SERVER_URL } from '..//config/settings'
+import { generateRequestResponseColor } from '../utils/generateResponse'
 
 export class ValidationService {
   public async getValidationRequest(validationId: string) {
@@ -68,40 +70,52 @@ export class ValidationService {
       const template = handlebars.compile(htmlContent)
 
       // Generate the HTML with the template and data
-      let emailResponse
-      validators.map(async (validator: { name: any; email: any }) => {
-        const html = template({
-          userInfo,
-          name: validator.name
-        })
-        // Send email
-        emailResponse = await sendEmail({
-          to: validator.email,
-          subject: 'Validation Request - LinkedTrust',
-          body: html
-        })
-      })
+      let emailResponse,
+        validationRequestRes = []
 
-      // Create validation requests in parallel
-      const validationRequests = validators.map(
-        async (validator: { name: string; email: string }) => {
-          try {
-            return await prisma.validationRequest.create({
-              data: {
-                claimId: +claimId,
-                validatorName: validator.name,
-                validatorEmail: validator.email,
-                context: 'CANDID'
-              }
-            })
-          } catch (error: any) {
-            console.error('Error creating validation request:', error.message)
+      if (validators) {
+        // Create validation requests in parallel
+        const validationRequests = validators.map(
+          async (validator: { name: string; email: string }) => {
+            try {
+              return await prisma.validationRequest.create({
+                data: {
+                  claimId: +claimId,
+                  validatorName: validator.name,
+                  validatorEmail: validator.email,
+                  context: 'CANDID'
+                }
+              })
+            } catch (error: any) {
+              console.error('Error creating validation request:', error.message)
+            }
           }
+        )
+
+        validationRequestRes = await Promise.all(validationRequests)
+      }
+      console.log('Validation requests sent successfully', validationRequestRes)
+
+      validationRequestRes.map(
+        async (validator: { id: number; validatorName: any; validatorEmail: any }) => {
+          const html = template({
+            userInfo,
+            name: validator.validatorName,
+            link: `${SERVER_URL}/validation/${validator.id}`
+          })
+          // Send email
+          emailResponse = await sendEmail({
+            to: validator.validatorEmail,
+            subject: 'Validation Request - LinkedTrust',
+            body: html
+          })
         }
       )
 
-      await Promise.all(validationRequests)
-      return emailResponse
+      return {
+        emailResponse,
+        validationRequestRes
+      }
     } catch (err: any) {
       console.error('Error sending validation requests:', err.message)
       throw new Error('Error sending validation requests')
@@ -109,6 +123,47 @@ export class ValidationService {
   }
 
   public async validateClaim(validationId: string, data: any) {
-    // Logic to validate claim
+    const { statement, rating } = data
+
+    console.log('statement', statement)
+    console.log('rating', rating)
+    // Schema validation
+    const schema = Joi.object({
+      statement: Joi.string().required(),
+      rating: Joi.number().required()
+    })
+
+    const { error } = schema.validate(data)
+    if (error) {
+      throw new Error('Validation error: ' + error.message)
+    }
+
+    const validationRequest = await prisma.validationRequest.findUnique({
+      where: { id: +validationId }
+    })
+
+    if (!validationRequest) {
+      throw new Error('Validation request not found')
+    }
+
+    const claim = await prisma.claim.findUnique({
+      where: { id: validationRequest.claimId }
+    })
+
+    if (!claim) {
+      throw new Error('Claim not found')
+    }
+
+    const updatedValidatioReq = await prisma.validationRequest.update({
+      where: { id: +validationId },
+      data: {
+        statement,
+        rating,
+        validationStatus: 'COMPLETED',
+        response: generateRequestResponseColor(rating)
+      }
+    })
+
+    return updatedValidatioReq
   }
 }
