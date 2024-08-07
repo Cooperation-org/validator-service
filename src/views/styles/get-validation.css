@@ -67,6 +67,8 @@ a:hover {
   padding: 15px;
   border-radius: 5px;
   margin-top: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .review-box p {
@@ -74,11 +76,14 @@ a:hover {
   word-break: break-word;
   /* Ensures long text will wrap */
 }
-
+#user-statement {
+  min-height: 100px;
+}
 .date {
   margin-top: 10px;
   font-size: 0.9em;
   color: #80cbc4;
+  justify-content: end;
 }
 
 textarea {
