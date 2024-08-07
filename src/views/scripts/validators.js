@@ -1,4 +1,4 @@
-const SERVER_URL = 'http://localhost:3000'
+const SERVER_URL = 'http://localhost:3000/api/v0'
 
 document.addEventListener('DOMContentLoaded', async () => {
   const contactsContainer = document.getElementById('contactsContainer')

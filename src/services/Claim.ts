@@ -68,6 +68,28 @@ export class ClaimService {
     return userInfo
   }
 
+  /**
+   * Get claim by claim ID
+   * @param claimId - Claim ID
+   * @returns Claim
+   */
+
+  public async getClaim(claimId: number) {
+    if (typeof claimId !== 'number') {
+      throw new Error('Invalid ID')
+    }
+
+    const claim = await prisma.claim.findUnique({
+      where: { id: claimId }
+    })
+
+    if (!claim) {
+      throw new Error('Claim not found')
+    }
+
+    return claim
+  }
+
   public async addClaimStatement(statement: string, id: number | string) {
     const userId = Number(id)
     if (isNaN(userId)) throw new Error('Invalid user ID')
