@@ -15,6 +15,7 @@ export const generateReportData = (data: any): ReportI => {
     ),
     validationDetails: data.validationDetails.map((detail: ValidationDetailsI) => {
       return {
+        validatorName: detail.validatorName,
         validatorEmail: detail.validatorEmail,
         validationStatus: detail.validationStatus,
         rating: detail.rating,
@@ -39,27 +40,36 @@ export const generateRequestResponseColor = (rating: number) => {
   else return 'RED'
 }
 
-export const generateReportResponseColor = (responses: string[]) => {
+export const generateReportResponseColor = (responses: (string | null)[]) => {
   let totalScore = 0
+  let validResponsesCount = 0
 
   responses.forEach(response => {
+    if (response === null) return
+
     switch (response) {
       case ResponseStatus.GREEN:
         totalScore += 3
+        validResponsesCount += 1
         break
       case ResponseStatus.YELLOW:
         totalScore += 2
+        validResponsesCount += 1
         break
       case ResponseStatus.RED:
         totalScore += 0
+        validResponsesCount += 1
         break
       default:
         throw new Error('Invalid response status')
     }
   })
 
-  const totalResponses = responses.length
-  const averageScore = totalScore / totalResponses
+  if (validResponsesCount === 0) {
+    throw new Error('No valid responses to calculate the score')
+  }
+
+  const averageScore = totalScore / validResponsesCount
 
   if (averageScore >= 2.5) return 'GREEN'
   if (averageScore >= 1.5) return 'YELLOW'

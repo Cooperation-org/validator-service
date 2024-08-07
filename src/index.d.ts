@@ -22,6 +22,7 @@ export interface ReportI {
 }
 
 export interface ValidationDetailsI {
+  validatorName: string
   validatorEmail: string
   validationStatus: ValidationStatus
   response: ResponseStatus
