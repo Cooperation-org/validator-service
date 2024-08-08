@@ -131,6 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const result = await response.json()
+      // reload page
+      location.reload()
       return result
     } catch (error) {
       console.error('Error:', error)
