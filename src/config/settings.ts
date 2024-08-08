@@ -7,4 +7,4 @@ export const LINKED_TRUST_SERVER_URL =
 
 export const LINKED_TRUST_URL = process.env.LINKED_TRUST_LOCAL_URL
 
-export const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000'
+export const SERVER_URL = process.env.SERVER_URL

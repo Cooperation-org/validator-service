@@ -1,4 +1,5 @@
-const SERVER_URL = 'http://localhost:3000/api/v0'
+// const SERVER_URL = 'http://localhost:3000'
+const SERVER_URL = 'https://validator-service-c7m2.onrender.com'
 
 document.addEventListener('DOMContentLoaded', async () => {
   const contactsContainer = document.getElementById('contactsContainer')
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let candidUserInfo
 
     try {
-      const response = await fetch(`${SERVER_URL}/user/${claimId}`)
+      const response = await fetch(`${SERVER_URL}/api/v0/user/${claimId}`)
       const data = await response.json()
       console.log('data:', data)
       if (!response.ok) {
@@ -132,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           contacts
         }
 
-        const response2 = await fetch(`${SERVER_URL}/send-validation-requests`, {
+        const response2 = await fetch(`${SERVER_URL}/api/v0/send-validation-requests`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

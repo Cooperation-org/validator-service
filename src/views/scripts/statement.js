@@ -1,4 +1,5 @@
-const SERVER_URL = 'http://localhost:3000'
+// const SERVER_URL = 'http://localhost:3000'
+const SERVER_URL = 'https://validator-service-c7m2.onrender.com'
 
 document.getElementById('statementForm').addEventListener('submit', function (event) {
   event.preventDefault()
