@@ -119,8 +119,8 @@ export class UserController {
 
   public generateReport = async (req: Request, res: Response) => {
     try {
-      const claimId = req.params.claimId
-      const report = await this.ClaimService.generateReport(claimId)
+      const id = req.params.id
+      const report = await this.ClaimService.generateReport(id)
       res.status(200).json({ message: 'Report generated', data: report })
     } catch (error: any) {
       res.status(500).json({ message: 'Error generating report: ' + error.message })

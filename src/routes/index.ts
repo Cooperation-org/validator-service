@@ -8,7 +8,7 @@ const userController = new UserController()
 // following route for create cliam in DB without statment
 //! PUBLIC ROUTES
 router.post('/validate', userController.createUserInfo)
-router.get('/report/:claimId', userController.generateReport)
+router.get('/report/:id', userController.generateReport)
 
 router.get('/user/:claimId', userController.getUserInfo)
 
