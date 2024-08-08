@@ -35,9 +35,11 @@ export class UserController {
       })
       console.log('html', html)
 
-      res
-        .status(201)
-        .json({ status: 'success', message: 'Data Received', data: { id: userInfo.id } })
+      res.status(201).json({
+        status: 'success',
+        message: 'Data Received',
+        data: { claimId: userInfo.id }
+      })
 
       // Send the email
       await sendEmail({
