@@ -44,7 +44,14 @@ document.getElementById('statementForm').addEventListener('submit', function (ev
     .catch(error => {
       console.error('======== err:', error)
       const messageDiv = document.getElementById('message')
-      messageDiv.innerText = 'Error submitting statement.'
+      if (
+        error.message === 'Claim already exists' ||
+        error.message === 'Network response was not ok'
+      ) {
+        messageDiv.innerText = 'You already submitted your statement for this claim.'
+      } else {
+        messageDiv.innerText = 'Error submitting statement.'
+      }
       messageDiv.classList.add('error')
       messageDiv.classList.remove('success')
       messageDiv.style.display = 'block'
